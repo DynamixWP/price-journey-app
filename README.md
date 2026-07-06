@@ -1,8 +1,8 @@
 # Price Journey App
 
-MVP frontend para validar el flujo de mockups:
+MVP frontend used to validate the mockup flow:
 
-- Journey Map (sidebar + mapa principal)
+- Journey Map (sidebar + main map)
 - Expedition Chapter
 - Artifact Viewer
 - Collections / Search
@@ -16,9 +16,9 @@ npm install
 npm run dev
 ```
 
-Abrí http://localhost:3000.
+Open http://localhost:3000.
 
-## Estructura principal
+## Main structure
 
 ```txt
 app/
@@ -30,17 +30,17 @@ app/
   api/health/route.ts
 
 lib/data/
-  schema.ts                        # tipos
+  schema.ts                        # types
   seed.ts                          # mock data
-  repository.ts                    # queries en memoria
+  repository.ts                    # in-memory queries
 ```
 
-## Base de datos: recomendación por etapa
+## Database recommendation by stage
 
-1. **Ahora (MVP):** usar `lib/data/seed.ts` en memoria para iterar rápido en UX y estructura.
-2. **Próxima etapa:** migrar a **Supabase Postgres** cuando definas:
-   - modelo final de entidades
-   - auth/permisos
-   - carga de metadata real
+1. **Now (MVP):** use the in-memory `lib/data/seed.ts` to iterate quickly on UX and structure.
+2. **Next stage:** migrate to **Supabase Postgres** once you define:
+   - final entity model
+   - auth/permissions
+   - real metadata ingestion
 
-Conclusión: **sí conviene Supabase**, pero **no desde el día 1** del prototipo visual. Primero validá navegación y modelo.
+Conclusion: **Supabase is a good fit**, but **not on day one** of the visual prototype. First validate navigation and the data model.
