@@ -405,6 +405,241 @@ a {
   font-weight: 500;
 }
 
+.collections-layout {
+  display: grid;
+  gap: 0.9rem;
+}
+
+.timeline-literal {
+  display: grid;
+  gap: 0.9rem;
+}
+
+.timeline-filters {
+  display: grid;
+  gap: 0.65rem;
+}
+
+.timeline-filter-group {
+  padding: 0.6rem;
+}
+
+.timeline-track-wrap {
+  overflow-x: auto;
+  border: 1px solid var(--line);
+  border-radius: 12px;
+  background: #fff;
+}
+
+.timeline-track {
+  position: relative;
+  min-width: 900px;
+  height: 340px;
+  padding: 1rem;
+}
+
+.timeline-axis {
+  position: absolute;
+  left: 1rem;
+  right: 1rem;
+  top: 50%;
+  height: 2px;
+  background: linear-gradient(90deg, #cdb896 0%, #9f8253 55%, #cdb896 100%);
+  transform: translateY(-50%);
+}
+
+.timeline-year {
+  position: absolute;
+  top: 50%;
+  transform: translate(-50%, -50%);
+  display: grid;
+  justify-items: center;
+  gap: 0.38rem;
+}
+
+.timeline-year__tick {
+  width: 2px;
+  height: 14px;
+  background: #8d7044;
+}
+
+.timeline-year__label {
+  font-size: 0.75rem;
+  color: var(--muted);
+}
+
+.timeline-node {
+  position: absolute;
+  transform: translateX(-50%);
+  border: 0;
+  background: transparent;
+  cursor: pointer;
+  display: grid;
+  justify-items: center;
+  gap: 0.35rem;
+}
+
+.timeline-node--top {
+  top: 30%;
+}
+
+.timeline-node--bottom {
+  top: 69%;
+}
+
+.timeline-node__dot {
+  width: 12px;
+  height: 12px;
+  border-radius: 999px;
+  background: var(--accent);
+  box-shadow: 0 0 0 3px rgba(111, 79, 42, 0.2);
+}
+
+.timeline-node__card {
+  min-width: 180px;
+  max-width: 220px;
+  border: 1px solid var(--line);
+  border-radius: 10px;
+  background: #fffdfa;
+  padding: 0.5rem 0.55rem;
+  display: grid;
+  gap: 0.2rem;
+  text-align: left;
+  box-shadow: var(--shadow-sm);
+}
+
+.timeline-node__title {
+  font-size: 0.84rem;
+  font-weight: 600;
+  color: var(--text);
+  line-height: 1.2;
+}
+
+.timeline-node.is-active .timeline-node__dot {
+  width: 14px;
+  height: 14px;
+  box-shadow: 0 0 0 5px rgba(111, 79, 42, 0.22);
+}
+
+.timeline-node.is-active .timeline-node__card {
+  border-color: var(--line-strong);
+  background: var(--accent-soft);
+}
+
+.timeline-selection {
+  gap: 0.65rem;
+}
+
+.timeline-selection__link {
+  border: 1px solid var(--line);
+  border-radius: 10px;
+  padding: 0.55rem 0.75rem;
+  background: #fff;
+  color: var(--accent);
+  width: fit-content;
+}
+
+.collections-searchbar {
+  display: flex;
+  gap: 0.55rem;
+}
+
+.filter-btn {
+  border: 1px solid var(--line-strong);
+  border-radius: 10px;
+  padding: 0.62rem 0.95rem;
+  background: #fff;
+  color: var(--text);
+  font-size: 0.9rem;
+  font-weight: 500;
+  cursor: pointer;
+}
+
+.filters-toolbar {
+  display: grid;
+  gap: 0.45rem;
+}
+
+.filters-grid {
+  display: grid;
+  gap: 0.8rem;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+}
+
+.filters-panel {
+  border: 1px solid var(--line);
+  border-radius: 12px;
+  background: #fff;
+  padding: 0.25rem 0.7rem 0.7rem;
+}
+
+.filters-panel__summary {
+  list-style: none;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.6rem;
+  cursor: pointer;
+  padding: 0.55rem 0;
+  font-size: 0.9rem;
+  color: var(--text);
+}
+
+.filters-panel__summary::-webkit-details-marker {
+  display: none;
+}
+
+.filters-grid.compact {
+  grid-template-columns: 1fr;
+  gap: 0.55rem;
+}
+
+.filter-group {
+  border: 1px solid var(--line);
+  border-radius: 12px;
+  padding: 0.7rem;
+  background: #fff;
+  display: grid;
+  gap: 0.5rem;
+}
+
+.filters-grid.compact .filter-group {
+  border: 0;
+  border-top: 1px dashed var(--line);
+  border-radius: 0;
+  padding: 0.55rem 0 0;
+  background: transparent;
+}
+
+.filter-chip {
+  transition: all 160ms ease;
+}
+
+.filter-chip.is-active {
+  border-color: var(--accent);
+  color: var(--accent);
+  background: var(--accent-soft);
+}
+
+.active-filters {
+  border: 1px solid var(--line);
+  border-radius: 12px;
+  padding: 0.7rem;
+  display: grid;
+  gap: 0.5rem;
+  background: #fff;
+}
+
+.filter-clear {
+  border: 1px solid var(--line);
+  border-radius: 10px;
+  padding: 0.45rem 0.7rem;
+  width: fit-content;
+  font-size: 0.82rem;
+  color: var(--accent);
+  background: #fff;
+}
+
 .artifact-preview {
   position: relative;
   width: 100%;
@@ -480,5 +715,12 @@ a {
   .related-docs__grid {
     grid-template-columns: 1fr;
   }
-}
 
+  .collections-searchbar {
+    flex-direction: column;
+  }
+
+  .filters-grid {
+    grid-template-columns: 1fr;
+  }
+}

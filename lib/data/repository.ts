@@ -4,11 +4,17 @@ import { Artifact, ArtifactType, Expedition, SourceKind } from "./schema";
 export interface ArtifactFilter {
   q?: string;
   countryId?: string;
+  countryIds?: string[];
   year?: number;
+  years?: number[];
   type?: ArtifactType;
+  types?: ArtifactType[];
   sourceKind?: SourceKind;
+  sourceKinds?: SourceKind[];
   stopId?: string;
+  stopIds?: string[];
   expeditionId?: string;
+  expeditionIds?: string[];
 }
 
 export function getProject() {
@@ -33,29 +39,39 @@ export function listTimeline() {
 
 export function searchArtifacts(filters: ArtifactFilter) {
   const normalizedQuery = filters.q?.trim().toLowerCase();
+  const years = filters.years ?? (typeof filters.year === "number" ? [filters.year] : []);
+  const countryIds = filters.countryIds ?? (filters.countryId ? [filters.countryId] : []);
+  const types = filters.types ?? (filters.type ? [filters.type] : []);
+  const sourceKinds = filters.sourceKinds ?? (filters.sourceKind ? [filters.sourceKind] : []);
+  const stopIds = filters.stopIds ?? (filters.stopId ? [filters.stopId] : []);
+  const expeditionIds =
+    filters.expeditionIds ?? (filters.expeditionId ? [filters.expeditionId] : []);
 
   return journeySeed.artifacts.filter((artifact) => {
-    if (filters.stopId && !artifact.stopIds.includes(filters.stopId)) {
+    if (stopIds.length > 0 && !stopIds.some((stopId) => artifact.stopIds.includes(stopId))) {
       return false;
     }
 
-    if (filters.expeditionId && !artifact.expeditionIds.includes(filters.expeditionId)) {
+    if (
+      expeditionIds.length > 0 &&
+      !expeditionIds.some((expeditionId) => artifact.expeditionIds.includes(expeditionId))
+    ) {
       return false;
     }
 
-    if (filters.countryId && !artifact.countryIds.includes(filters.countryId)) {
+    if (countryIds.length > 0 && !countryIds.some((countryId) => artifact.countryIds.includes(countryId))) {
       return false;
     }
 
-    if (typeof filters.year === "number" && !artifact.dateLabel.includes(String(filters.year))) {
+    if (years.length > 0 && !years.some((year) => artifact.dateLabel.includes(String(year)))) {
       return false;
     }
 
-    if (filters.type && artifact.type !== filters.type) {
+    if (types.length > 0 && !types.includes(artifact.type)) {
       return false;
     }
 
-    if (filters.sourceKind && artifact.sourceKind !== filters.sourceKind) {
+    if (sourceKinds.length > 0 && !sourceKinds.includes(artifact.sourceKind)) {
       return false;
     }
 
