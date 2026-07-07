@@ -24,6 +24,9 @@ export interface Stop {
   lat: number;
   lng: number;
   visitDateLabel?: string;
+  sourcePdf?: string;
+  sourcePage?: number;
+  sourceNote?: string;
   artifactIds: string[];
 }
 
@@ -79,4 +82,3 @@ export interface JourneyProject {
   artifacts: Artifact[];
   collections: Collection[];
 }
-
