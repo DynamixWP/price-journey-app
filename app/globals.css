@@ -333,6 +333,55 @@ a {
   font-weight: 500;
 }
 
+.journey-stop-card {
+  gap: 0.28rem;
+}
+
+.journey-stop-card.is-active {
+  border-color: var(--line-strong);
+  background: var(--accent-soft);
+}
+
+.journey-stop-card__button {
+  border: 0;
+  background: transparent;
+  text-align: left;
+  cursor: pointer;
+  font: inherit;
+  color: inherit;
+}
+
+.journey-sidebar-gallery {
+  display: grid;
+  gap: 0.55rem;
+}
+
+.journey-sidebar-gallery__grid {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 0.5rem;
+}
+
+.journey-sidebar-thumb {
+  border: 1px solid var(--line);
+  border-radius: 10px;
+  overflow: hidden;
+  background: #fff;
+  display: grid;
+}
+
+.journey-sidebar-thumb img {
+  width: 100%;
+  height: auto;
+  display: block;
+}
+
+.journey-sidebar-thumb span {
+  padding: 0.4rem 0.5rem 0.5rem;
+  font-size: 0.8rem;
+  line-height: 1.25;
+}
+
 .related-docs {
   display: grid;
   gap: 0.7rem;

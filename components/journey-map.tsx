@@ -1,8 +1,9 @@
 "use client";
 
+import Image from "next/image";
 import Link from "next/link";
-import maplibregl from "maplibre-gl";
-import { useEffect, useMemo, useRef } from "react";
+import maplibregl, { LngLatLike } from "maplibre-gl";
+import { useEffect, useMemo, useRef, useState } from "react";
 import { JourneyProject } from "@/lib/data/schema";
 import { useJourneyMapStore } from "@/lib/state/journey-map-store";
 
@@ -13,15 +14,18 @@ type Props = {
 type MarkerRef = {
   marker: maplibregl.Marker;
   button: HTMLButtonElement;
-  coords: [number, number];
+  coords: LngLatLike;
+  stopId: string;
+  expeditionId: string;
 };
 
 export function JourneyMap({ project }: Props) {
   const mapContainerRef = useRef<HTMLDivElement | null>(null);
   const mapRef = useRef<maplibregl.Map | null>(null);
-  const markersRef = useRef<Record<string, MarkerRef>>({});
+  const markersRef = useRef<MarkerRef[]>([]);
   const selectedExpeditionId = useJourneyMapStore((state) => state.selectedExpeditionId);
   const setSelectedExpeditionId = useJourneyMapStore((state) => state.setSelectedExpeditionId);
+  const [selectedStopId, setSelectedStopId] = useState<string | null>(null);
 
   const selectedExpedition = useMemo(
     () => project.expeditions.find((expedition) => expedition.id === selectedExpeditionId),
@@ -32,6 +36,26 @@ export function JourneyMap({ project }: Props) {
     () => new Map(project.countries.map((country) => [country.id, country.name])),
     [project.countries],
   );
+  const selectedStop = useMemo(
+    () => selectedExpedition?.stops.find((stop) => stop.id === selectedStopId) ?? selectedExpedition?.stops[0] ?? null,
+    [selectedExpedition, selectedStopId],
+  );
+  const activeStopId = selectedStop?.id ?? null;
+
+  const stopArtifacts = useMemo(() => {
+    if (!selectedExpedition || !selectedStop) return [];
+    const fromStop = project.artifacts.filter((artifact) => selectedStop.artifactIds.includes(artifact.id));
+    if (fromStop.length >= 3) return fromStop.slice(0, 3);
+    const fallback = project.artifacts.filter(
+      (artifact) =>
+        artifact.expeditionIds.includes(selectedExpedition.id) &&
+        !fromStop.some((base) => base.id === artifact.id),
+    );
+    return [...fromStop, ...fallback].slice(0, 3);
+  }, [project.artifacts, selectedExpedition, selectedStop]);
+
+  const thumbFor = (id: string) =>
+    `https://picsum.photos/seed/${encodeURIComponent(id)}/360/220`;
 
   useEffect(() => {
     if (!mapContainerRef.current || mapRef.current) {
@@ -50,48 +74,54 @@ export function JourneyMap({ project }: Props) {
     map.addControl(new maplibregl.NavigationControl({ visualizePitch: true }), "top-left");
 
     for (const expedition of project.expeditions) {
-      const stop = expedition.stops[0];
-      if (!stop) {
-        continue;
+      for (const stop of expedition.stops) {
+        const markerButton = document.createElement("button");
+        markerButton.type = "button";
+        markerButton.className = "map-marker-btn";
+        markerButton.innerHTML = `<span class="map-marker-btn__dot"></span><span class="map-marker-btn__year">${stop.visitDateLabel ?? expedition.yearStart}</span>`;
+        markerButton.onclick = () => {
+          setSelectedExpeditionId(expedition.id);
+          setSelectedStopId(stop.id);
+        };
+
+        const coords: [number, number] = [stop.lng, stop.lat];
+        const marker = new maplibregl.Marker({
+          element: markerButton,
+          anchor: "bottom",
+        })
+          .setLngLat(coords)
+          .addTo(map);
+
+        markersRef.current.push({
+          marker,
+          button: markerButton,
+          coords,
+          stopId: stop.id,
+          expeditionId: expedition.id,
+        });
       }
-
-      const markerButton = document.createElement("button");
-      markerButton.type = "button";
-      markerButton.className = "map-marker-btn";
-      markerButton.innerHTML = `<span class="map-marker-btn__dot"></span><span class="map-marker-btn__year">${expedition.yearStart}</span>`;
-      markerButton.onclick = () => setSelectedExpeditionId(expedition.id);
-
-      const coords: [number, number] = [stop.lng, stop.lat];
-      const marker = new maplibregl.Marker({
-        element: markerButton,
-        anchor: "bottom",
-      })
-        .setLngLat(coords)
-        .addTo(map);
-
-      markersRef.current[expedition.id] = { marker, button: markerButton, coords };
     }
 
     return () => {
-      for (const entry of Object.values(markersRef.current)) {
+      for (const entry of markersRef.current) {
         entry.marker.remove();
       }
-      markersRef.current = {};
+      markersRef.current = [];
       map.remove();
       mapRef.current = null;
     };
   }, [project.expeditions, setSelectedExpeditionId]);
 
   useEffect(() => {
-    for (const [expeditionId, entry] of Object.entries(markersRef.current)) {
-      entry.button.classList.toggle("is-active", expeditionId === selectedExpeditionId);
+    for (const entry of markersRef.current) {
+      entry.button.classList.toggle("is-active", entry.stopId === activeStopId);
     }
 
-    if (!selectedExpeditionId) {
+    if (!activeStopId) {
       return;
     }
 
-    const selected = markersRef.current[selectedExpeditionId];
+    const selected = markersRef.current.find((entry) => entry.stopId === activeStopId);
     if (!selected || !mapRef.current) {
       return;
     }
@@ -102,7 +132,7 @@ export function JourneyMap({ project }: Props) {
       duration: 700,
       essential: true,
     });
-  }, [selectedExpeditionId]);
+  }, [activeStopId]);
 
   return (
     <section className={`journey-layout panel ${selectedExpedition ? "has-open-sidebar" : ""}`}>
@@ -120,7 +150,10 @@ export function JourneyMap({ project }: Props) {
               key={expedition.id}
               type="button"
               className={`chip journey-map__chip ${selectedExpeditionId === expedition.id ? "is-active" : ""}`}
-              onClick={() => setSelectedExpeditionId(expedition.id)}
+              onClick={() => {
+                setSelectedExpeditionId(expedition.id);
+                setSelectedStopId(expedition.stops[0]?.id ?? null);
+              }}
             >
               {expedition.title}
             </button>
@@ -157,14 +190,54 @@ export function JourneyMap({ project }: Props) {
             <h4 className="section-title space-top">Stops</h4>
             <ul className="list">
               {selectedExpedition.stops.map((stop) => (
-                <li className="card" key={stop.id}>
-                  <p className="card__title">{stop.name}</p>
+                <li
+                  className={`card journey-stop-card ${selectedStop?.id === stop.id ? "is-active" : ""}`}
+                  key={stop.id}
+                >
+                  <button
+                    type="button"
+                    className="journey-stop-card__button"
+                    onClick={() => setSelectedStopId(stop.id)}
+                  >
+                    <p className="card__title">{stop.name}</p>
+                  </button>
                   <p className="meta">
-                    {countryById.get(stop.countryId)} &middot; {stop.artifactIds.length} artifacts
+                    {stop.visitDateLabel ?? selectedExpedition.yearStart} · {countryById.get(stop.countryId)}
                   </p>
+                  {stop.sourcePdf ? (
+                    <p className="meta">
+                      Source: {stop.sourcePdf} · p.{stop.sourcePage ?? 1}
+                    </p>
+                  ) : null}
                 </li>
               ))}
             </ul>
+
+            {selectedStop ? (
+              <div className="journey-sidebar-gallery">
+                <div className="row">
+                  <h4 className="section-title">Related previews</h4>
+                  <span className="chip">{selectedStop.name}</span>
+                </div>
+                <div className="journey-sidebar-gallery__grid">
+                  {stopArtifacts.map((artifact) => (
+                    <Link
+                      key={artifact.id}
+                      href={`/artifacts/${artifact.id}`}
+                      className="journey-sidebar-thumb"
+                    >
+                      <Image
+                        src={thumbFor(artifact.id)}
+                        alt={`${artifact.title} preview`}
+                        width={360}
+                        height={220}
+                      />
+                      <span>{artifact.title}</span>
+                    </Link>
+                  ))}
+                </div>
+              </div>
+            ) : null}
 
             <Link href={`/chapters/${selectedExpedition.id}`} className="journey-sidebar__link">
               Open full chapter &rarr;

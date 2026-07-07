@@ -2,10 +2,18 @@
 
 import Link from "next/link";
 import { useMemo, useState } from "react";
-import { JourneyProject, SourceKind } from "@/lib/data/schema";
+import { JourneyProject, SourceKind, Stop } from "@/lib/data/schema";
 
 type Props = {
   project: JourneyProject;
+};
+
+type StopEntry = {
+  stop: Stop;
+  expeditionId: string;
+  expeditionTitle: string;
+  year: number;
+  sourceKinds: SourceKind[];
 };
 
 const SOURCE_LABEL: Record<SourceKind, string> = {
@@ -17,10 +25,20 @@ function unique<T>(values: T[]) {
   return [...new Set(values)];
 }
 
+function getYear(stop: Stop, fallback: number) {
+  if (stop.visitDateLabel) {
+    const match = stop.visitDateLabel.match(/\d{4}/);
+    if (match) {
+      return Number(match[0]);
+    }
+  }
+  return fallback;
+}
+
 export function TimelineLiteral({ project }: Props) {
   const [countryFilter, setCountryFilter] = useState<string>("all");
   const [sourceFilter, setSourceFilter] = useState<SourceKind | "all">("all");
-  const [selectedId, setSelectedId] = useState<string | null>(project.expeditions[0]?.id ?? null);
+  const [selectedStopId, setSelectedStopId] = useState<string | null>(null);
 
   const years = useMemo(() => [...project.years].sort((a, b) => a - b), [project.years]);
   const minYear = years[0] ?? 1931;
@@ -32,36 +50,36 @@ export function TimelineLiteral({ project }: Props) {
     [project.expeditions],
   );
 
-  const filtered = useMemo(
-    () =>
-      project.expeditions
-        .filter((expedition) => {
-          if (countryFilter !== "all" && !expedition.countries.includes(countryFilter)) {
-            return false;
-          }
-          if (sourceFilter !== "all" && !expedition.sourceKinds.includes(sourceFilter)) {
-            return false;
-          }
-          return true;
-        })
-        .sort((a, b) => a.yearStart - b.yearStart),
-    [countryFilter, project.expeditions, sourceFilter],
-  );
+  const entries = useMemo(() => {
+    const base: StopEntry[] = project.expeditions.flatMap((expedition) =>
+      expedition.stops.map((stop) => ({
+        stop,
+        expeditionId: expedition.id,
+        expeditionTitle: expedition.title,
+        year: getYear(stop, expedition.yearStart),
+        sourceKinds: expedition.sourceKinds,
+      })),
+    );
+
+    return base
+      .filter((entry) => {
+        if (countryFilter !== "all" && entry.stop.countryId !== countryFilter) return false;
+        if (sourceFilter !== "all" && !entry.sourceKinds.includes(sourceFilter)) return false;
+        return true;
+      })
+      .sort((a, b) => (a.year === b.year ? a.stop.name.localeCompare(b.stop.name) : a.year - b.year));
+  }, [countryFilter, project.expeditions, sourceFilter]);
 
   const selected =
-    filtered.find((expedition) => expedition.id === selectedId) ??
-    filtered[0] ??
-    null;
+    entries.find((entry) => entry.stop.id === selectedStopId) ?? entries[0] ?? null;
 
   return (
     <section className="panel timeline-literal">
       <div className="row">
         <h2 className="section-title">Timeline</h2>
-        <span className="chip">{filtered.length} expeditions</span>
+        <span className="chip">{entries.length} stops</span>
       </div>
-      <p className="meta">
-        Literal timeline view with year-based positioning and direct chapter access.
-      </p>
+      <p className="meta">Literal timeline by exact travel stops and year.</p>
 
       <div className="timeline-filters">
         <div className="filter-group timeline-filter-group">
@@ -125,26 +143,22 @@ export function TimelineLiteral({ project }: Props) {
             );
           })}
 
-          {filtered.map((expedition, index) => {
-            const midYear = expedition.yearEnd
-              ? (expedition.yearStart + expedition.yearEnd) / 2
-              : expedition.yearStart;
-            const left = ((midYear - minYear) / yearSpan) * 100;
+          {entries.map((entry, index) => {
+            const left = ((entry.year - minYear) / yearSpan) * 100;
             const lane = index % 2 === 0 ? "top" : "bottom";
-            const isActive = selected?.id === expedition.id;
-
+            const isActive = selected?.stop.id === entry.stop.id;
             return (
               <button
-                key={expedition.id}
+                key={entry.stop.id}
                 type="button"
                 className={`timeline-node timeline-node--${lane} ${isActive ? "is-active" : ""}`}
                 style={{ left: `${left}%` }}
-                onClick={() => setSelectedId(expedition.id)}
+                onClick={() => setSelectedStopId(entry.stop.id)}
               >
                 <span className="timeline-node__dot" />
                 <span className="timeline-node__card">
-                  <span className="timeline-node__title">{expedition.title}</span>
-                  <span className="meta">{expedition.dateLabel}</span>
+                  <span className="timeline-node__title">{entry.stop.name}</span>
+                  <span className="meta">{entry.year} · {entry.expeditionTitle}</span>
                 </span>
               </button>
             );
@@ -154,25 +168,26 @@ export function TimelineLiteral({ project }: Props) {
 
       {selected ? (
         <article className="timeline-selection card">
-          <p className="card__title">{selected.title}</p>
-          <p className="meta">{selected.summary}</p>
+          <p className="card__title">{selected.stop.name}</p>
+          <p className="meta">{selected.stop.visitDateLabel ?? selected.year}</p>
           <div className="chip-row">
-            <span className="chip">{selected.dateLabel}</span>
-            {selected.countries.map((countryId) => {
-              const label = project.countries.find((country) => country.id === countryId)?.name ?? countryId;
-              return (
-                <span className="chip" key={countryId}>
-                  {label}
-                </span>
-              );
-            })}
+            <span className="chip">
+              {project.countries.find((country) => country.id === selected.stop.countryId)?.name ??
+                selected.stop.countryId}
+            </span>
+            {selected.stop.sourcePdf ? <span className="chip">{selected.stop.sourcePdf}</span> : null}
           </div>
-          <Link href={`/chapters/${selected.id}`} className="timeline-selection__link">
+          {selected.stop.sourcePdf ? (
+            <p className="meta">
+              Source: {selected.stop.sourcePdf} · p.{selected.stop.sourcePage ?? 1}
+            </p>
+          ) : null}
+          <Link href={`/chapters/${selected.expeditionId}`} className="timeline-selection__link">
             Open chapter &rarr;
           </Link>
         </article>
       ) : (
-        <p className="meta">No expeditions match the selected filters.</p>
+        <p className="meta">No stops match the selected filters.</p>
       )}
     </section>
   );
