@@ -9,7 +9,7 @@ MVP frontend used to validate the mockup flow:
 - Timeline
 - Health endpoint: `GET /api/health`
 
-## Local development
+## Local development 
 
 ```bash
 npm install
