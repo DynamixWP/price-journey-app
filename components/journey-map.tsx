@@ -17,7 +17,21 @@ type MarkerRef = {
   coords: LngLatLike;
   stopId: string;
   expeditionId: string;
+  years: number[];
 };
+
+function getStopYears(stop: JourneyProject["expeditions"][number]["stops"][number], yearStart: number, yearEnd?: number) {
+  const parsed = stop.visitDateLabel?.match(/\d{4}/g)?.map(Number) ?? [];
+  if (parsed.length > 0) {
+    return [...new Set(parsed)];
+  }
+  const end = yearEnd ?? yearStart;
+  const years: number[] = [];
+  for (let year = yearStart; year <= end; year += 1) {
+    years.push(year);
+  }
+  return years;
+}
 
 export function JourneyMap({ project }: Props) {
   const mapContainerRef = useRef<HTMLDivElement | null>(null);
@@ -26,20 +40,62 @@ export function JourneyMap({ project }: Props) {
   const selectedExpeditionId = useJourneyMapStore((state) => state.selectedExpeditionId);
   const setSelectedExpeditionId = useJourneyMapStore((state) => state.setSelectedExpeditionId);
   const [selectedStopId, setSelectedStopId] = useState<string | null>(null);
+  const [selectedYear, setSelectedYear] = useState<number | "all">("all");
+
+  const mapYears = useMemo(() => {
+    const years = new Set<number>();
+    for (const expedition of project.expeditions) {
+      for (const stop of expedition.stops) {
+        for (const year of getStopYears(stop, expedition.yearStart, expedition.yearEnd)) {
+          years.add(year);
+        }
+      }
+    }
+    return [...years].sort((a, b) => a - b);
+  }, [project.expeditions]);
+
+  const expeditionStopsByYear = useMemo(() => {
+    const byExpedition = new Map<string, Set<string>>();
+    for (const expedition of project.expeditions) {
+      const stopIds = new Set<string>();
+      for (const stop of expedition.stops) {
+        const years = getStopYears(stop, expedition.yearStart, expedition.yearEnd);
+        if (selectedYear === "all" || years.includes(selectedYear)) {
+          stopIds.add(stop.id);
+        }
+      }
+      byExpedition.set(expedition.id, stopIds);
+    }
+    return byExpedition;
+  }, [project.expeditions, selectedYear]);
+
+  const visibleExpeditions = useMemo(
+    () => project.expeditions.filter((expedition) => (expeditionStopsByYear.get(expedition.id)?.size ?? 0) > 0),
+    [expeditionStopsByYear, project.expeditions],
+  );
 
   const selectedExpedition = useMemo(
-    () => project.expeditions.find((expedition) => expedition.id === selectedExpeditionId),
-    [project.expeditions, selectedExpeditionId],
+    () => visibleExpeditions.find((expedition) => expedition.id === selectedExpeditionId),
+    [visibleExpeditions, selectedExpeditionId],
   );
 
   const countryById = useMemo(
     () => new Map(project.countries.map((country) => [country.id, country.name])),
     [project.countries],
   );
-  const selectedStop = useMemo(
-    () => selectedExpedition?.stops.find((stop) => stop.id === selectedStopId) ?? selectedExpedition?.stops[0] ?? null,
-    [selectedExpedition, selectedStopId],
-  );
+  const visibleStopsForSelectedExpedition = useMemo(() => {
+    if (!selectedExpedition) return [];
+    const stopIds = expeditionStopsByYear.get(selectedExpedition.id);
+    if (!stopIds) return [];
+    return selectedExpedition.stops.filter((stop) => stopIds.has(stop.id));
+  }, [expeditionStopsByYear, selectedExpedition]);
+  const selectedStop = useMemo(() => {
+    return (
+      visibleStopsForSelectedExpedition.find((stop) => stop.id === selectedStopId) ??
+      visibleStopsForSelectedExpedition[0] ??
+      null
+    );
+  }, [selectedStopId, visibleStopsForSelectedExpedition]);
   const activeStopId = selectedStop?.id ?? null;
 
   const stopArtifacts = useMemo(() => {
@@ -98,6 +154,7 @@ export function JourneyMap({ project }: Props) {
           coords,
           stopId: stop.id,
           expeditionId: expedition.id,
+          years: getStopYears(stop, expedition.yearStart, expedition.yearEnd),
         });
       }
     }
@@ -111,6 +168,31 @@ export function JourneyMap({ project }: Props) {
       mapRef.current = null;
     };
   }, [project.expeditions, setSelectedExpeditionId]);
+
+  useEffect(() => {
+    let hasVisibleMarkers = false;
+    for (const entry of markersRef.current) {
+      const isVisible = selectedYear === "all" || entry.years.includes(selectedYear);
+      entry.button.style.display = isVisible ? "" : "none";
+      if (isVisible) hasVisibleMarkers = true;
+    }
+
+    if (!hasVisibleMarkers) {
+      setSelectedExpeditionId(null);
+      setSelectedStopId(null);
+      return;
+    }
+
+    if (selectedExpeditionId) {
+      const expeditionStopIds = expeditionStopsByYear.get(selectedExpeditionId);
+      if (!expeditionStopIds || expeditionStopIds.size === 0) {
+        setSelectedExpeditionId(null);
+        setSelectedStopId(null);
+      } else if (selectedStopId && !expeditionStopIds.has(selectedStopId)) {
+        setSelectedStopId(null);
+      }
+    }
+  }, [expeditionStopsByYear, selectedExpeditionId, selectedStopId, selectedYear, setSelectedExpeditionId]);
 
   useEffect(() => {
     for (const entry of markersRef.current) {
@@ -135,123 +217,163 @@ export function JourneyMap({ project }: Props) {
   }, [activeStopId]);
 
   return (
-    <section className={`journey-layout panel ${selectedExpedition ? "has-open-sidebar" : ""}`}>
-      <div className="journey-map">
-        <h2 className="section-title">Journey Map</h2>
-        <p className="meta">
-          Tap a journey on the map to open its chapter in the sidebar.
-        </p>
-
-        <div ref={mapContainerRef} className="journey-map__surface" />
-
-        <div className="journey-map__legend">
-          {project.expeditions.map((expedition) => (
-            <button
-              key={expedition.id}
-              type="button"
-              className={`chip journey-map__chip ${selectedExpeditionId === expedition.id ? "is-active" : ""}`}
-              onClick={() => {
-                setSelectedExpeditionId(expedition.id);
-                setSelectedStopId(expedition.stops[0]?.id ?? null);
-              }}
-            >
-              {expedition.title}
-            </button>
-          ))}
+    <section className="journey-map-shell">
+      <aside className="journey-filters-sidebar">
+        <div className="row">
+          <h3 className="section-title">Filters</h3>
+          <button
+            type="button"
+            className="chip filter-chip"
+            onClick={() => setSelectedYear("all")}
+          >
+            Reset
+          </button>
         </div>
-      </div>
-
-      <aside className={`journey-sidebar ${selectedExpedition ? "is-open" : ""}`}>
-        {selectedExpedition ? (
-          <>
-            <div className="row">
-              <h3 className="section-title">Expedition Chapter</h3>
+        <div className="filter-group journey-filters-sidebar__group">
+          <p className="meta">Year</p>
+          <div className="journey-filters-sidebar__years">
+            <button
+              type="button"
+              className={`chip filter-chip ${selectedYear === "all" ? "is-active" : ""}`}
+              onClick={() => setSelectedYear("all")}
+            >
+              All years
+            </button>
+            {mapYears.map((year) => (
               <button
+                key={year}
                 type="button"
-                className="journey-sidebar__close"
-                onClick={() => setSelectedExpeditionId(null)}
+                className={`chip filter-chip ${selectedYear === year ? "is-active" : ""}`}
+                onClick={() => setSelectedYear(year)}
               >
-                Close
+                {year}
               </button>
-            </div>
-            <article className="card">
-              <p className="card__title">{selectedExpedition.title}</p>
-              <p className="meta">{selectedExpedition.summary}</p>
-              <div className="chip-row">
-                <span className="chip">{selectedExpedition.dateLabel}</span>
-                {selectedExpedition.countries.map((countryId) => (
-                  <span className="chip" key={countryId}>
-                    {countryById.get(countryId) ?? countryId}
-                  </span>
-                ))}
-              </div>
-            </article>
+            ))}
+          </div>
+        </div>
+      </aside>
 
-            <h4 className="section-title space-top">Stops</h4>
-            <ul className="list">
-              {selectedExpedition.stops.map((stop) => (
-                <li
-                  className={`card journey-stop-card ${selectedStop?.id === stop.id ? "is-active" : ""}`}
-                  key={stop.id}
+      <section className={`journey-layout panel ${selectedExpedition ? "has-open-sidebar" : ""}`}>
+        <div className="journey-map">
+          <h2 className="section-title">Journey Map</h2>
+          <p className="meta">
+            Tap a journey on the map to open its chapter in the sidebar.
+          </p>
+
+          <div ref={mapContainerRef} className="journey-map__surface" />
+
+          <div className="journey-map__legend">
+            {visibleExpeditions.map((expedition) => (
+              <button
+                key={expedition.id}
+                type="button"
+                className={`chip journey-map__chip ${selectedExpeditionId === expedition.id ? "is-active" : ""}`}
+                onClick={() => {
+                  setSelectedExpeditionId(expedition.id);
+                  const firstVisibleStop = expedition.stops.find((stop) =>
+                    expeditionStopsByYear.get(expedition.id)?.has(stop.id),
+                  );
+                  setSelectedStopId(firstVisibleStop?.id ?? null);
+                }}
+              >
+                {expedition.title}
+              </button>
+            ))}
+          </div>
+        </div>
+
+        <aside className={`journey-sidebar ${selectedExpedition ? "is-open" : ""}`}>
+          {selectedExpedition ? (
+            <>
+              <div className="row">
+                <h3 className="section-title">Expedition Chapter</h3>
+                <button
+                  type="button"
+                  className="journey-sidebar__close"
+                  onClick={() => setSelectedExpeditionId(null)}
                 >
-                  <button
-                    type="button"
-                    className="journey-stop-card__button"
-                    onClick={() => setSelectedStopId(stop.id)}
-                  >
-                    <p className="card__title">{stop.name}</p>
-                  </button>
-                  <p className="meta">
-                    {stop.visitDateLabel ?? selectedExpedition.yearStart} · {countryById.get(stop.countryId)}
-                  </p>
-                  {stop.sourcePdf ? (
-                    <p className="meta">
-                      Source: {stop.sourcePdf} · p.{stop.sourcePage ?? 1}
-                    </p>
-                  ) : null}
-                </li>
-              ))}
-            </ul>
-
-            {selectedStop ? (
-              <div className="journey-sidebar-gallery">
-                <div className="row">
-                  <h4 className="section-title">Related previews</h4>
-                  <span className="chip">{selectedStop.name}</span>
-                </div>
-                <div className="journey-sidebar-gallery__grid">
-                  {stopArtifacts.map((artifact) => (
-                    <Link
-                      key={artifact.id}
-                      href={`/artifacts/${artifact.id}`}
-                      className="journey-sidebar-thumb"
-                    >
-                      <Image
-                        src={thumbFor(artifact.id)}
-                        alt={`${artifact.title} preview`}
-                        width={360}
-                        height={220}
-                      />
-                      <span>{artifact.title}</span>
-                    </Link>
+                  Close
+                </button>
+              </div>
+              <article className="card">
+                <p className="card__title">{selectedExpedition.title}</p>
+                <p className="meta">{selectedExpedition.summary}</p>
+                <div className="chip-row">
+                  <span className="chip">{selectedExpedition.dateLabel}</span>
+                  {selectedExpedition.countries.map((countryId) => (
+                    <span className="chip" key={countryId}>
+                      {countryById.get(countryId) ?? countryId}
+                    </span>
                   ))}
                 </div>
-              </div>
-            ) : null}
+              </article>
 
-            <Link href={`/chapters/${selectedExpedition.id}`} className="journey-sidebar__link">
-              Open full chapter &rarr;
-            </Link>
-          </>
-        ) : (
-          <div className="journey-sidebar__empty">
-            <h3 className="section-title">Sidebar</h3>
-            <p className="meta">
-              Select a journey on the map to see its chapter.
-            </p>
-          </div>
-        )}
-      </aside>
+              <h4 className="section-title space-top">Stops</h4>
+              <ul className="list">
+                {visibleStopsForSelectedExpedition.map((stop) => (
+                  <li
+                    className={`journey-stop-card ${selectedStop?.id === stop.id ? "is-active" : ""}`}
+                    key={stop.id}
+                  >
+                    <button
+                      type="button"
+                      className="card journey-stop-card__button"
+                      onClick={() => setSelectedStopId(stop.id)}
+                    >
+                      <p className="card__title">{stop.name}</p>
+                      <p className="meta">
+                        {stop.visitDateLabel ?? selectedExpedition.yearStart} · {countryById.get(stop.countryId)}
+                      </p>
+                      {stop.sourcePdf ? (
+                        <p className="meta">
+                          Source: {stop.sourcePdf} · p.{stop.sourcePage ?? 1}
+                        </p>
+                      ) : null}
+                    </button>
+                  </li>
+                ))}
+              </ul>
+
+              {selectedStop ? (
+                <div className="journey-sidebar-gallery">
+                  <div className="row">
+                    <h4 className="section-title">Related previews</h4>
+                    <span className="chip">{selectedStop.name}</span>
+                  </div>
+                  <div className="journey-sidebar-gallery__grid">
+                    {stopArtifacts.map((artifact) => (
+                      <Link
+                        key={artifact.id}
+                        href={`/artifacts/${artifact.id}`}
+                        className="journey-sidebar-thumb"
+                      >
+                        <Image
+                          src={thumbFor(artifact.id)}
+                          alt={`${artifact.title} preview`}
+                          width={360}
+                          height={220}
+                        />
+                        <span>{artifact.title}</span>
+                      </Link>
+                    ))}
+                  </div>
+                </div>
+              ) : null}
+
+              <Link href={`/chapters/${selectedExpedition.id}`} className="journey-sidebar__link">
+                Open full chapter &rarr;
+              </Link>
+            </>
+          ) : (
+            <div className="journey-sidebar__empty">
+              <h3 className="section-title">Sidebar</h3>
+              <p className="meta">
+                Select a journey on the map to see its chapter.
+              </p>
+            </div>
+          )}
+        </aside>
+      </section>
     </section>
   );
 }
