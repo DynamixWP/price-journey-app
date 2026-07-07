@@ -324,11 +324,6 @@ export function JourneyMap({ project }: Props) {
                       <p className="meta">
                         {stop.visitDateLabel ?? selectedExpedition.yearStart} · {countryById.get(stop.countryId)}
                       </p>
-                      {stop.sourcePdf ? (
-                        <p className="meta">
-                          Source: {stop.sourcePdf} · p.{stop.sourcePage ?? 1}
-                        </p>
-                      ) : null}
                     </button>
                   </li>
                 ))}
