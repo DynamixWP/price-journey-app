@@ -1,18 +1,12 @@
 import type { Metadata } from "next";
-import Link from "next/link";
 import { Cormorant_Garamond, Inter } from "next/font/google";
+import { Nav } from "@/components/nav";
 import "./globals.css";
 
 export const metadata: Metadata = {
   title: "Price Journey MVP",
   description: "Weston Price archive exploration prototype",
 };
-
-const navLinks = [
-  { href: "/", label: "Journey Map" },
-  { href: "/timeline", label: "Timeline" },
-  { href: "/collections", label: "Collections" },
-];
 
 const sans = Inter({
   variable: "--font-sans",
@@ -39,13 +33,7 @@ export default function RootLayout({
               <p className="eyebrow">Weston Price Online Archive</p>
               <h1 className="brand">Price Journey MVP</h1>
             </div>
-            <nav className="nav">
-              {navLinks.map((link) => (
-                <Link key={link.href} href={link.href} className="nav__link">
-                  {link.label}
-                </Link>
-              ))}
-            </nav>
+            <Nav />
           </div>
         </header>
         <main className="main">{children}</main>

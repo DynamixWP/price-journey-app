@@ -134,7 +134,7 @@ export function JourneyMap({ project }: Props) {
         const markerButton = document.createElement("button");
         markerButton.type = "button";
         markerButton.className = "map-marker-btn";
-        markerButton.innerHTML = `<span class="map-marker-btn__dot"></span><span class="map-marker-btn__year">${stop.visitDateLabel ?? expedition.yearStart}</span>`;
+        markerButton.innerHTML = `<svg class="map-marker-icon" width="22" height="30" viewBox="0 0 22 30" fill="none" aria-hidden="true"><path d="M11 0C4.925 0 0 4.925 0 11c0 8.25 11 19 11 19S22 19.25 22 11C22 4.925 17.075 0 11 0z" fill="currentColor"/><circle cx="11" cy="11" r="4" fill="white" fill-opacity="0.85"/></svg><span class="map-marker-btn__year">${stop.visitDateLabel ?? expedition.yearStart}</span>`;
         markerButton.onclick = () => {
           setSelectedExpeditionId(expedition.id);
           setSelectedStopId(stop.id);
