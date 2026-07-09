@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import { Cormorant_Garamond, Inter } from "next/font/google";
+import Script from "next/script";
 import { Nav } from "@/components/nav";
 import "./globals.css";
 
@@ -25,8 +26,16 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="en-US" className={`${sans.variable} ${serif.variable}`}>
+    <html lang="en-US" className={`${sans.variable} ${serif.variable}`} suppressHydrationWarning>
       <body>
+        <Script id="theme-init" strategy="beforeInteractive">
+          {`try {
+  var storedTheme = localStorage.getItem("price-journey-theme");
+  var systemTheme = window.matchMedia("(prefers-color-scheme: dark)").matches ? "dark" : "light";
+  var theme = storedTheme === "dark" || storedTheme === "light" ? storedTheme : systemTheme;
+  document.documentElement.dataset.theme = theme;
+} catch (error) {}`}
+        </Script>
         <header className="topbar">
           <div className="topbar__inner">
             <div>

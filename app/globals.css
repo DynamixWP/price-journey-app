@@ -11,9 +11,32 @@
   --accent: #1B2E4B;
   --accent-soft: #E9EDF4;
   --gold: #B8831A;
+  --cta-bg: #1B2E4B;
+  --cta-text: #F7FAFF;
+  --cta-hover: #15243a;
   --radius: 5px;
   --shadow-sm: 0 4px 10px rgba(27, 46, 75, 0.08);
   --shadow-md: 0 12px 28px rgba(27, 46, 75, 0.16);
+  --body-bg: linear-gradient(160deg, #fdf8f1 0%, var(--bg) 55%, #ede3d5 100%);
+}
+
+html[data-theme="dark"] {
+  --bg: #0f1825;
+  --bg-soft: #152033;
+  --panel: #1a2639;
+  --line: #31445f;
+  --line-strong: #4a6388;
+  --text: #eef3ff;
+  --muted: #9eb0cf;
+  --accent: #d6e4ff;
+  --accent-soft: #273752;
+  --gold: #d6a84f;
+  --cta-bg: #9fb8e3;
+  --cta-text: #0b1524;
+  --cta-hover: #b3c7ea;
+  --shadow-sm: 0 4px 12px rgba(6, 12, 20, 0.55);
+  --shadow-md: 0 12px 30px rgba(6, 12, 20, 0.66);
+  --body-bg: linear-gradient(160deg, #10192a 0%, #121f31 52%, #0a131f 100%);
 }
 
 * {
@@ -28,7 +51,7 @@ body {
 }
 
 body {
-  background: linear-gradient(160deg, #fdf8f1 0%, var(--bg) 55%, #ede3d5 100%);
+  background: var(--body-bg);
   color: var(--text);
   font-family: var(--font-sans), "Inter", -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
   -webkit-font-smoothing: antialiased;
@@ -41,7 +64,7 @@ a {
 
 .topbar {
   border-bottom: 1px solid var(--line);
-  background: rgba(253, 250, 246, 0.96);
+  background: color-mix(in srgb, var(--panel) 92%, transparent);
   backdrop-filter: blur(8px);
   position: sticky;
   top: 0;
@@ -78,6 +101,8 @@ a {
 
 .nav {
   display: flex;
+  align-items: center;
+  flex-wrap: wrap;
   gap: 0.2rem;
 }
 
@@ -101,6 +126,30 @@ a {
 .nav__link.is-active {
   color: var(--text);
   border-bottom-color: var(--text);
+}
+
+.nav__theme-toggle {
+  border: 1px solid var(--line);
+  border-radius: 999px;
+  background: var(--panel);
+  color: var(--text);
+  width: 2.05rem;
+  height: 2.05rem;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: border-color 160ms ease, background-color 160ms ease, color 160ms ease;
+}
+
+.nav__theme-toggle:hover {
+  border-color: var(--line-strong);
+  background: var(--accent-soft);
+}
+
+.nav__theme-icon {
+  width: 1rem;
+  height: 1rem;
 }
 
 .main {
@@ -143,7 +192,7 @@ a {
 .card {
   border: 1px solid var(--line);
   border-radius: 5px;
-  background: linear-gradient(180deg, #fffdfa 0%, #fbf6ee 100%);
+  background: linear-gradient(180deg, color-mix(in srgb, var(--panel) 98%, white 2%) 0%, color-mix(in srgb, var(--panel) 88%, var(--bg-soft) 12%) 100%);
   padding: 0.85rem;
   display: grid;
   gap: 0.45rem;
@@ -166,7 +215,7 @@ a {
   padding: 0.22rem 0.56rem;
   font-size: 0.72rem;
   color: var(--muted);
-  background: #fff;
+  background: var(--panel);
 }
 
 .section-title {
@@ -192,7 +241,7 @@ a {
   border: 1px solid var(--line);
   border-radius: 5px;
   overflow: hidden;
-  background: #fff;
+  background: var(--panel);
 }
 
 .table th,
@@ -212,7 +261,7 @@ a {
   width: 160px;
   color: var(--muted);
   font-weight: 500;
-  background: #fcf8ef;
+  background: color-mix(in srgb, var(--panel) 88%, var(--bg-soft) 12%);
 }
 
 .search {
@@ -220,7 +269,8 @@ a {
   border: 1px solid var(--line);
   border-radius: 5px;
   padding: 0.66rem 0.8rem;
-  background: #fff;
+  background: var(--panel);
+  color: var(--text);
   font-size: 0.92rem;
 }
 
@@ -252,7 +302,7 @@ a {
   gap: 0.45rem;
   border: 1px solid var(--line);
   border-radius: 5px;
-  background: #fff;
+  background: var(--panel);
   padding: 0.5rem;
 }
 
@@ -300,8 +350,15 @@ h2.section-title {
 }
 
 .journey-map__surface .maplibregl-canvas {
-  /* grayscale first strips distinct country hues, then sepia tints everything to a uniform warm parchment */
-  filter: grayscale(1) sepia(0.72) saturate(0.62) contrast(0.88) brightness(1.06);
+  filter: none;
+}
+
+html[data-theme="light"] .journey-map__surface .maplibregl-canvas {
+  filter: sepia(0.26) saturate(0.92) contrast(0.98) brightness(0.96);
+}
+
+html[data-theme="dark"] .journey-map__surface .maplibregl-canvas {
+  filter: saturate(0.95) contrast(1.02) brightness(0.9);
 }
 
 .journey-map__surface .maplibregl-control-container .maplibregl-ctrl-group {
@@ -312,7 +369,8 @@ h2.section-title {
 }
 
 .journey-map__surface .maplibregl-ctrl button {
-  background: #fff;
+  background: var(--panel);
+  color: var(--text);
 }
 
 .journey-map__legend {
@@ -323,7 +381,7 @@ h2.section-title {
 
 .journey-map__chip {
   cursor: pointer;
-  background: #fff;
+  background: var(--panel);
   transition: all 180ms ease;
 }
 
@@ -384,6 +442,20 @@ h2.section-title {
   transition: all 160ms ease;
 }
 
+.icon-button {
+  width: 1.95rem;
+  height: 1.95rem;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0;
+}
+
+.icon-button svg {
+  width: 0.95rem;
+  height: 0.95rem;
+}
+
 .journey-sidebar__close:hover {
   color: var(--text);
   border-color: var(--text);
@@ -392,8 +464,8 @@ h2.section-title {
 .journey-sidebar__link {
   display: block;
   text-align: center;
-  background: var(--accent);
-  color: #fff;
+  background: var(--cta-bg);
+  color: var(--cta-text);
   border: none;
   border-radius: 5px;
   padding: 0.78rem 1rem;
@@ -401,11 +473,12 @@ h2.section-title {
   font-weight: 600;
   letter-spacing: 0.06em;
   text-transform: uppercase;
-  transition: background 160ms ease;
+  transition: background 160ms ease, box-shadow 160ms ease;
 }
 
 .journey-sidebar__link:hover {
-  background: #0f1d30;
+  background: var(--cta-hover);
+  box-shadow: 0 0 0 1px color-mix(in srgb, var(--cta-bg) 70%, var(--line-strong) 30%);
 }
 
 .journey-stop-card {
@@ -419,7 +492,7 @@ h2.section-title {
 
 .journey-stop-card__button {
   border: 0;
-  background: linear-gradient(180deg, #fffdfa 0%, #fbf6ee 100%);
+  background: linear-gradient(180deg, color-mix(in srgb, var(--panel) 98%, white 2%) 0%, color-mix(in srgb, var(--panel) 88%, var(--bg-soft) 12%) 100%);
   text-align: left;
   cursor: pointer;
   font: inherit;
@@ -429,10 +502,14 @@ h2.section-title {
   gap: 0.28rem;
 }
 
-.journey-stop-card.is-active .journey-stop-card__button {
-  border-color: var(--line-strong);
+.journey-stop-card__button:hover {
   background: var(--accent-soft);
-  color: var(--accent);
+}
+
+.journey-stop-card.is-active .journey-stop-card__button {
+  border-color: var(--accent);
+  background: var(--accent-soft);
+  color: var(--text);
 }
 
 .journey-sidebar-gallery {
@@ -450,7 +527,7 @@ h2.section-title {
   border: 1px solid var(--line);
   border-radius: 5px;
   overflow: hidden;
-  background: #fff;
+  background: var(--panel);
   display: grid;
 }
 
@@ -479,7 +556,7 @@ h2.section-title {
 
 .related-docs__tab {
   cursor: pointer;
-  background: #fff;
+  background: var(--panel);
 }
 
 .related-docs__tab.is-active {
@@ -498,7 +575,7 @@ h2.section-title {
   border: 1px solid var(--line);
   border-radius: 5px;
   overflow: hidden;
-  background: #fff;
+  background: var(--panel);
   display: grid;
   transition: transform 160ms ease, box-shadow 160ms ease;
 }
@@ -531,7 +608,7 @@ h2.section-title {
   border: 1px solid var(--line);
   border-radius: 5px;
   padding: 0.6rem 0.78rem;
-  background: #fff;
+  background: var(--panel);
   font-size: 0.9rem;
   width: fit-content;
   color: var(--accent);
@@ -564,6 +641,10 @@ h2.section-title {
   background: linear-gradient(180deg, #fffefb 0%, #f8f2e7 100%);
 }
 
+html[data-theme="dark"] .timeline-track-wrap {
+  background: linear-gradient(180deg, #182335 0%, #131f30 100%);
+}
+
 .timeline-svg {
   display: block;
 }
@@ -582,18 +663,18 @@ h2.section-title {
 }
 
 .timeline-svg__node-connector {
-  stroke: #C5BDB0;
+  stroke: color-mix(in srgb, var(--line-strong) 80%, var(--line) 20%);
   stroke-width: 1.6;
   transition: stroke 160ms ease;
 }
 
 .timeline-svg__node-dot {
-  fill: #1B2E4B;
+  fill: var(--accent);
 }
 
 .timeline-svg__node-card {
-  fill: #FDFAF6;
-  stroke: #DDD5C5;
+  fill: var(--panel);
+  stroke: var(--line);
   filter: drop-shadow(0 3px 6px rgba(27, 46, 75, 0.1));
   transition: fill 160ms ease, stroke 160ms ease;
 }
@@ -607,12 +688,12 @@ h2.section-title {
 }
 
 .timeline-svg__node:hover .timeline-svg__node-card {
-  fill: #E9EDF4;
-  stroke: #BEB09A;
+  fill: var(--accent-soft);
+  stroke: var(--line-strong);
 }
 
 .timeline-svg__node:hover .timeline-svg__node-connector {
-  stroke: #1B2E4B;
+  stroke: var(--accent);
 }
 
 .timeline-svg__node.is-active .timeline-svg__stop-label {
@@ -620,16 +701,12 @@ h2.section-title {
 }
 
 .timeline-svg__node.is-active .timeline-svg__node-card {
-  fill: #E9EDF4;
-  stroke: #1B2E4B;
+  fill: var(--accent-soft);
+  stroke: var(--accent);
 }
 
 .timeline-svg__node.is-active .timeline-svg__node-connector {
-  stroke: #1B2E4B;
-}
-
-.timeline-svg__node.is-active .timeline-svg__node-connector {
-  stroke: #1B2E4B;
+  stroke: var(--accent);
 }
 
 .timeline-selection {
@@ -638,8 +715,8 @@ h2.section-title {
 
 .timeline-selection__link {
   display: inline-block;
-  background: var(--accent);
-  color: #fff;
+  background: var(--cta-bg);
+  color: var(--cta-text);
   border: none;
   border-radius: 5px;
   padding: 0.65rem 1rem;
@@ -648,11 +725,12 @@ h2.section-title {
   letter-spacing: 0.06em;
   text-transform: uppercase;
   width: fit-content;
-  transition: background 160ms ease;
+  transition: background 160ms ease, box-shadow 160ms ease;
 }
 
 .timeline-selection__link:hover {
-  background: #0f1d30;
+  background: var(--cta-hover);
+  box-shadow: 0 0 0 1px color-mix(in srgb, var(--cta-bg) 70%, var(--line-strong) 30%);
 }
 
 .collections-searchbar {
@@ -664,7 +742,7 @@ h2.section-title {
   border: 1px solid var(--line-strong);
   border-radius: 5px;
   padding: 0.62rem 0.95rem;
-  background: #fff;
+  background: var(--panel);
   color: var(--text);
   font-size: 0.9rem;
   font-weight: 500;
@@ -685,7 +763,7 @@ h2.section-title {
 .filters-panel {
   border: 1px solid var(--line);
   border-radius: 5px;
-  background: #fff;
+  background: var(--panel);
   padding: 0.25rem 0.7rem 0.7rem;
 }
 
@@ -714,7 +792,7 @@ h2.section-title {
   border: 1px solid var(--line);
   border-radius: 5px;
   padding: 0.7rem;
-  background: #fff;
+  background: var(--panel);
   display: grid;
   gap: 0.5rem;
 }
@@ -743,7 +821,7 @@ h2.section-title {
   padding: 0.7rem;
   display: grid;
   gap: 0.5rem;
-  background: #fff;
+  background: var(--panel);
 }
 
 .filter-clear {
@@ -753,7 +831,7 @@ h2.section-title {
   width: fit-content;
   font-size: 0.82rem;
   color: var(--accent);
-  background: #fff;
+  background: var(--panel);
 }
 
 .artifact-preview {
@@ -763,7 +841,7 @@ h2.section-title {
   border: 1px solid var(--line);
   border-radius: 5px;
   overflow: hidden;
-  background: #eee7d8;
+  background: color-mix(in srgb, var(--panel) 75%, var(--bg-soft) 25%);
 }
 
 .artifact-preview__image {
@@ -802,7 +880,7 @@ h2.section-title {
   letter-spacing: 0.04em;
   border: 1px solid var(--line-strong);
   border-radius: 999px;
-  background: rgba(253, 250, 246, 0.97);
+  background: color-mix(in srgb, var(--panel) 92%, transparent);
   padding: 0.1rem 0.48rem;
   color: var(--text);
   box-shadow: 0 2px 5px rgba(27, 46, 75, 0.12);
