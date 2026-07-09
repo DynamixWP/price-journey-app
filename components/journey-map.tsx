@@ -11,6 +11,8 @@ type Props = {
   project: JourneyProject;
 };
 
+type Theme = "light" | "dark";
+
 type MarkerRef = {
   marker: maplibregl.Marker;
   button: HTMLButtonElement;
@@ -19,6 +21,9 @@ type MarkerRef = {
   expeditionId: string;
   years: number[];
 };
+
+const LIGHT_MAP_STYLE = "https://basemaps.cartocdn.com/gl/voyager-nolabels-gl-style/style.json";
+const DARK_MAP_STYLE = "https://basemaps.cartocdn.com/gl/dark-matter-nolabels-gl-style/style.json";
 
 function getStopYears(stop: JourneyProject["expeditions"][number]["stops"][number], yearStart: number, yearEnd?: number) {
   const parsed = stop.visitDateLabel?.match(/\d{4}/g)?.map(Number) ?? [];
@@ -41,6 +46,7 @@ export function JourneyMap({ project }: Props) {
   const setSelectedExpeditionId = useJourneyMapStore((state) => state.setSelectedExpeditionId);
   const [selectedStopId, setSelectedStopId] = useState<string | null>(null);
   const [selectedYear, setSelectedYear] = useState<number | "all">("all");
+  const [theme, setTheme] = useState<Theme>("light");
 
   const mapYears = useMemo(() => {
     const years = new Set<number>();
@@ -114,13 +120,23 @@ export function JourneyMap({ project }: Props) {
     `https://picsum.photos/seed/${encodeURIComponent(id)}/360/220`;
 
   useEffect(() => {
+    const root = document.documentElement;
+    const getTheme = (): Theme => (root.dataset.theme === "dark" ? "dark" : "light");
+    setTheme(getTheme());
+
+    const observer = new MutationObserver(() => setTheme(getTheme()));
+    observer.observe(root, { attributes: true, attributeFilter: ["data-theme"] });
+    return () => observer.disconnect();
+  }, []);
+
+  useEffect(() => {
     if (!mapContainerRef.current || mapRef.current) {
       return;
     }
 
     const map = new maplibregl.Map({
       container: mapContainerRef.current,
-      style: "https://demotiles.maplibre.org/style.json",
+      style: theme === "dark" ? DARK_MAP_STYLE : LIGHT_MAP_STYLE,
       center: [0, 20],
       zoom: 1.3,
       minZoom: 1.1,
@@ -168,6 +184,11 @@ export function JourneyMap({ project }: Props) {
       mapRef.current = null;
     };
   }, [project.expeditions, setSelectedExpeditionId]);
+
+  useEffect(() => {
+    if (!mapRef.current) return;
+    mapRef.current.setStyle(theme === "dark" ? DARK_MAP_STYLE : LIGHT_MAP_STYLE);
+  }, [theme]);
 
   useEffect(() => {
     let hasVisibleMarkers = false;
@@ -223,10 +244,21 @@ export function JourneyMap({ project }: Props) {
           <h3 className="section-title">Filters</h3>
           <button
             type="button"
-            className="chip filter-chip"
+            className="chip filter-chip icon-button"
             onClick={() => setSelectedYear("all")}
+            aria-label="Reset year filter"
+            title="Reset year filter"
           >
-            Reset
+            <svg viewBox="0 0 24 24" aria-hidden="true">
+              <path
+                d="M21 12a9 9 0 1 1-2.64-6.36M21 4v6h-6"
+                fill="none"
+                stroke="currentColor"
+                strokeWidth="1.9"
+                strokeLinecap="round"
+                strokeLinejoin="round"
+              />
+            </svg>
           </button>
         </div>
         <div className="filter-group journey-filters-sidebar__group">
@@ -289,10 +321,20 @@ export function JourneyMap({ project }: Props) {
                 <h3 className="section-title">Expedition Chapter</h3>
                 <button
                   type="button"
-                  className="journey-sidebar__close"
+                  className="journey-sidebar__close icon-button"
                   onClick={() => setSelectedExpeditionId(null)}
+                  aria-label="Close sidebar"
+                  title="Close sidebar"
                 >
-                  Close
+                  <svg viewBox="0 0 24 24" aria-hidden="true">
+                    <path
+                      d="M18 6 6 18M6 6l12 12"
+                      fill="none"
+                      stroke="currentColor"
+                      strokeWidth="1.9"
+                      strokeLinecap="round"
+                    />
+                  </svg>
                 </button>
               </div>
               <article className="card">
