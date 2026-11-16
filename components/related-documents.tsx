@@ -4,6 +4,7 @@ import Image from "next/image";
 import Link from "next/link";
 import { useMemo, useState } from "react";
 import { Artifact, ArtifactType } from "@/lib/data/schema";
+import { imageForArtifact } from "@/lib/visuals";
 
 type Props = {
   stopId: string;
@@ -75,10 +76,6 @@ function diversifyByType(artifacts: Artifact[], limit: number): Artifact[] {
 function displayTypeLabel(type: ArtifactType) {
   if (type === "field_note") return "Field Note";
   return type[0].toUpperCase() + type.slice(1);
-}
-
-function getDummyThumbnail(artifact: Artifact) {
-  return `https://picsum.photos/seed/${encodeURIComponent(artifact.id)}/420/280`;
 }
 
 function buildDemoDocs(stopName: string, tab: TabKey, amount: number): Artifact[] {
@@ -159,14 +156,15 @@ export function RelatedDocuments({ stopId, stopName, artifacts }: Props) {
           <article className="related-doc-card" key={artifact.id}>
             <Image
               className="related-doc-card__image"
-              src={getDummyThumbnail(artifact)}
-              alt={`${artifact.title} preview`}
+              src={imageForArtifact(artifact)}
+              alt={`Conceptual period recreation accompanying ${artifact.title}`}
               width={420}
               height={280}
             />
             <div className="related-doc-card__body">
               <p className="related-doc-card__title">{artifact.title}</p>
               <p className="meta">{artifact.description}</p>
+              <small className="recreation-label">Conceptual recreation</small>
               <div className="chip-row">
                 <span className="chip">{displayTypeLabel(artifact.type)}</span>
                 <span className="chip">{artifact.dateLabel}</span>

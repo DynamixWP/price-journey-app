@@ -1,6 +1,8 @@
 import Link from "next/link";
+import Image from "next/image";
 import { getProject, searchArtifacts } from "@/lib/data/repository";
 import { Artifact, ArtifactType, SourceKind } from "@/lib/data/schema";
+import { imageForArtifact } from "@/lib/visuals";
 
 type SearchParams = Promise<Record<string, string | string[] | undefined>>;
 
@@ -158,11 +160,12 @@ export default async function CollectionsPage({ searchParams }: Props) {
     sort !== "relevance";
 
   return (
-    <section className="panel collections-layout">
-      <div className="row">
-        <h2 className="section-title">Collections / Search</h2>
-        <span className="chip">{artifacts.length} results</span>
-      </div>
+    <section className="collections-layout archive-page">
+      <header className="archive-page__header">
+        <div><span>Research archive · visual index</span><h1>The field collection</h1></div>
+        <p>Letters, photographs and field notes connected across place and time.</p>
+        <strong>{artifacts.length}<small>visible records</small></strong>
+      </header>
 
       <form method="get" className="collections-searchbar">
         <input className="search" name="q" defaultValue={q} placeholder="Search title, tags, and description" />
@@ -319,18 +322,19 @@ export default async function CollectionsPage({ searchParams }: Props) {
         </div>
       )}
 
-      <ul className="list space-top">
+      <ul className="archive-grid space-top">
         {artifacts.map((artifact) => (
-          <li className="card" key={artifact.id}>
-            <p className="card__title">{artifact.title}</p>
-            <p className="meta">{artifact.description}</p>
-            <div className="chip-row">
-              <span className="chip">{TYPE_LABEL[artifact.type]}</span>
-              <span className="chip">{SOURCE_LABEL[artifact.sourceKind]}</span>
-              <span className="chip">{artifact.dateLabel}</span>
-            </div>
-            <Link href={`/artifacts/${artifact.id}`} className="meta">
-              Open artifact &rarr;
+          <li key={artifact.id}>
+            <Link href={`/artifacts/${artifact.id}`} className="archive-tile">
+              <div className="archive-tile__image">
+                <Image src={imageForArtifact(artifact)} alt="" fill sizes="(max-width: 700px) 100vw, 33vw" />
+                <span>{artifact.archiveRef}</span>
+              </div>
+              <div className="archive-tile__body">
+                <p>{TYPE_LABEL[artifact.type]} · {artifact.dateLabel}</p>
+                <h2>{artifact.title}</h2>
+                <span>{artifact.description}</span>
+              </div>
             </Link>
           </li>
         ))}

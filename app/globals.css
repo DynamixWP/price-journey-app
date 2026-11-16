@@ -158,6 +158,16 @@ a {
   padding: 1.25rem 1.5rem 2rem;
 }
 
+/* Full-bleed Atlas surface. These overrides keep the selected Archive Wall direction
+   independent from the older collection and timeline layouts. */
+.main:has(.atlas-home) { max-width: none; padding: 0; }
+body:has(.atlas-home) { background: #f2eee5; }
+body:has(.atlas-home) .topbar { position: relative; border-bottom-color: #c9c2b5; background: #f7f3ea; color: #1f211d; }
+body:has(.atlas-home) .topbar__inner { max-width: none; }
+body:has(.atlas-home) .eyebrow, body:has(.atlas-home) .nav__link { color: #65645d; }
+body:has(.atlas-home) .brand, body:has(.atlas-home) .nav__link.is-active, body:has(.atlas-home) .nav__link:hover { color: #1f211d; }
+body:has(.atlas-home) .nav__theme-toggle { border-color: #aaa396; background: transparent; color: #1f211d; }
+
 .page-grid {
   display: grid;
   grid-template-columns: 320px 1fr;
