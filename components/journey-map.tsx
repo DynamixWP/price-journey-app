@@ -2,7 +2,8 @@
 
 import Image from "next/image";
 import Link from "next/link";
-import maplibregl, { LngLatLike } from "maplibre-gl";
+import * as maplibregl from "@/lib/maplibre";
+import type { LngLatLike } from "@/lib/maplibre";
 import { useEffect, useMemo, useRef, useState } from "react";
 import { JourneyProject } from "@/lib/data/schema";
 import { useJourneyMapStore } from "@/lib/state/journey-map-store";

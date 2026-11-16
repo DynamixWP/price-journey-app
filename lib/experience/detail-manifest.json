@@ -1,0 +1,280 @@
+[
+  {
+    "id": "detail-church",
+    "text": "The church draws the eye, but the written account introduces a person: Reverend John Siegen. Price credits the local pastor with helping his work in the valley. Behind a journey like this are people who opened doors and shared their knowledge.",
+    "audio": "/narration/detail-church.mp3",
+    "duration": 16.381,
+    "cues": [
+      {
+        "start": 0.1,
+        "end": 6.655,
+        "text": "The church draws the eye, but the written account introduces a person: Reverend John Siegen."
+      },
+      {
+        "start": 6.655,
+        "end": 11.201,
+        "text": "Price credits the local pastor with helping his work in the valley."
+      },
+      {
+        "start": 11.201,
+        "end": 16.357,
+        "text": "Behind a journey like this are people who opened doors and shared their knowledge."
+      }
+    ]
+  },
+  {
+    "id": "detail-landscape",
+    "text": "Look from the open ground toward the forest. Price describes hay for cattle, rye for people, and woodland protected against falling snow and rock. This is context from his account; the photograph alone cannot tell us which crop grew in each field.",
+    "audio": "/narration/detail-landscape.mp3",
+    "duration": 17.673,
+    "cues": [
+      {
+        "start": 0.1,
+        "end": 3.502,
+        "text": "Look from the open ground toward the forest."
+      },
+      {
+        "start": 3.502,
+        "end": 10.661,
+        "text": "Price describes hay for cattle, rye for people, and woodland protected against falling snow and rock."
+      },
+      {
+        "start": 10.661,
+        "end": 17.649,
+        "text": "This is context from his account; the photograph alone cannot tell us which crop grew in each field."
+      }
+    ]
+  },
+  {
+    "id": "detail-sign",
+    "text": "Rotorua Dental Clinic. These words connect the image to a real city. The national story began earlier: in April 1921, thirty women started training in Wellington for the School Dental Service. This is the programme’s history, not a date assigned to this photograph.",
+    "audio": "/narration/detail-sign.mp3",
+    "duration": 20.983,
+    "cues": [
+      {
+        "start": 0.1,
+        "end": 2.749,
+        "text": "Rotorua Dental Clinic."
+      },
+      {
+        "start": 2.749,
+        "end": 6.513,
+        "text": "These words connect the image to a real city."
+      },
+      {
+        "start": 6.513,
+        "end": 15.831,
+        "text": "The national story began earlier: in April 1921, thirty women started training in Wellington for the School Dental Service."
+      },
+      {
+        "start": 15.831,
+        "end": 20.959,
+        "text": "This is the programme’s history, not a date assigned to this photograph."
+      }
+    ]
+  },
+  {
+    "id": "detail-people",
+    "text": "The man is Colonel Saunders, identified in Price’s text. Beside him stands a dental operator whose name is not given in this passage. Looking closely is also an invitation to recover the names and experiences missing from the published account.",
+    "audio": "/narration/detail-people.mp3",
+    "duration": 17.446,
+    "cues": [
+      {
+        "start": 0.1,
+        "end": 4.979,
+        "text": "The man is Colonel Saunders, identified in Price’s text."
+      },
+      {
+        "start": 4.979,
+        "end": 10.363,
+        "text": "Beside him stands a dental operator whose name is not given in this passage."
+      },
+      {
+        "start": 10.363,
+        "end": 17.422,
+        "text": "Looking closely is also an invitation to recover the names and experiences missing from the published account."
+      }
+    ]
+  },
+  {
+    "id": "detail-peru-scale",
+    "text": "Begin with the people standing at the foot of the wall. They give these enormous stones a human scale. Price identifies this upper photograph as Sacsayhuamán, above Cusco. The names of the people beside the wall are not given in this passage.",
+    "audio": "/narration/detail-peru-scale.mp3",
+    "duration": 17.887,
+    "cues": [
+      {
+        "start": 0.1,
+        "end": 3.857,
+        "text": "Begin with the people standing at the foot of the wall."
+      },
+      {
+        "start": 3.857,
+        "end": 7.607,
+        "text": "They give these enormous stones a human scale."
+      },
+      {
+        "start": 7.607,
+        "end": 13.303,
+        "text": "Price identifies this upper photograph as Sacsayhuamán, above Cusco."
+      },
+      {
+        "start": 13.303,
+        "end": 17.863,
+        "text": "The names of the people beside the wall are not given in this passage."
+      }
+    ]
+  },
+  {
+    "id": "detail-peru-stone",
+    "text": "Follow the edges of the large stone in the lower photograph. Each turn meets another carefully shaped block. Price draws attention to the close fit of this masonry. The paired images move from the scale of a wall to the detail of its construction.",
+    "audio": "/narration/detail-peru-stone.mp3",
+    "duration": 17.475,
+    "cues": [
+      {
+        "start": 0.1,
+        "end": 4.439,
+        "text": "Follow the edges of the large stone in the lower photograph."
+      },
+      {
+        "start": 4.439,
+        "end": 8.147,
+        "text": "Each turn meets another carefully shaped block."
+      },
+      {
+        "start": 8.147,
+        "end": 12.209,
+        "text": "Price draws attention to the close fit of this masonry."
+      },
+      {
+        "start": 12.209,
+        "end": 17.451,
+        "text": "The paired images move from the scale of a wall to the detail of its construction."
+      }
+    ]
+  },
+  {
+    "id": "detail-rarotonga-gaze",
+    "text": "A slight tilt of the head, light across the face, a moment held by the camera. This portrait appears in Figure 35, whose caption places its subjects on Rarotonga. The caption preserves the island connection, while leaving this person’s name unrecorded.",
+    "audio": "/narration/detail-rarotonga-gaze.mp3",
+    "duration": 18.583,
+    "cues": [
+      {
+        "start": 0.1,
+        "end": 5.831,
+        "text": "A slight tilt of the head, light across the face, a moment held by the camera."
+      },
+      {
+        "start": 5.831,
+        "end": 12.422,
+        "text": "This portrait appears in Figure 35, whose caption places its subjects on Rarotonga."
+      },
+      {
+        "start": 12.422,
+        "end": 18.559,
+        "text": "The caption preserves the island connection, while leaving this person’s name unrecorded."
+      }
+    ]
+  },
+  {
+    "id": "detail-rarotonga-frame",
+    "text": "The broad brim of a hat frames the face. This is the second of the two upper portraits in Figure 35, connected by its caption to Rarotonga. The page brings these people together, but it does not establish a relationship between them.",
+    "audio": "/narration/detail-rarotonga-frame.mp3",
+    "duration": 17.077,
+    "cues": [
+      {
+        "start": 0.1,
+        "end": 3.488,
+        "text": "The broad brim of a hat frames the face."
+      },
+      {
+        "start": 3.488,
+        "end": 10.973,
+        "text": "This is the second of the two upper portraits in Figure 35, connected by its caption to Rarotonga."
+      },
+      {
+        "start": 10.973,
+        "end": 17.053,
+        "text": "The page brings these people together, but it does not establish a relationship between them."
+      }
+    ]
+  },
+  {
+    "id": "detail-north-island-gaze",
+    "text": "Look at the way the face fills the frame. This portrait is published in Price’s New Zealand chapter, alongside three others in Figure 69. His account locates the fieldwork on the North Island. The individual community and the sitter’s name remain unconfirmed here.",
+    "audio": "/narration/detail-north-island-gaze.mp3",
+    "duration": 19.889,
+    "cues": [
+      {
+        "start": 0.1,
+        "end": 3.289,
+        "text": "Look at the way the face fills the frame."
+      },
+      {
+        "start": 3.289,
+        "end": 10.618,
+        "text": "This portrait is published in Price’s New Zealand chapter, alongside three others in Figure 69."
+      },
+      {
+        "start": 10.618,
+        "end": 14.695,
+        "text": "His account locates the fieldwork on the North Island."
+      },
+      {
+        "start": 14.695,
+        "end": 19.865,
+        "text": "The individual community and the sitter’s name remain unconfirmed here."
+      }
+    ]
+  },
+  {
+    "id": "detail-north-island-record",
+    "text": "Light catches the eyes and the edge of a smile. In the book, this face shares a plate with three other Māori portraits. Seeing one photograph at a time makes room for an individual presence, even where the published caption leaves a name to be recovered.",
+    "audio": "/narration/detail-north-island-record.mp3",
+    "duration": 17.531,
+    "cues": [
+      {
+        "start": 0.1,
+        "end": 3.8,
+        "text": "Light catches the eyes and the edge of a smile."
+      },
+      {
+        "start": 3.8,
+        "end": 8.97,
+        "text": "In the book, this face shares a plate with three other Māori portraits."
+      },
+      {
+        "start": 8.97,
+        "end": 17.507,
+        "text": "Seeing one photograph at a time makes room for an individual presence, even where the published caption leaves a name to be recovered."
+      }
+    ]
+  },
+  {
+    "id": "detail-new-caledonia-portrait",
+    "text": "The close framing brings one person forward from the background. The passage introducing Figure 28 places these portraits in New Caledonia. Price’s wider Pacific journey depended on local guides and interpreters. Their work helped make encounters like these possible, though this person’s own account is absent here.",
+    "audio": "/narration/detail-new-caledonia-portrait.mp3",
+    "duration": 22.617,
+    "cues": [
+      {
+        "start": 0.1,
+        "end": 4.709,
+        "text": "The close framing brings one person forward from the background."
+      },
+      {
+        "start": 4.709,
+        "end": 10.505,
+        "text": "The passage introducing Figure 28 places these portraits in New Caledonia."
+      },
+      {
+        "start": 10.505,
+        "end": 16.016,
+        "text": "Price’s wider Pacific journey depended on local guides and interpreters."
+      },
+      {
+        "start": 16.016,
+        "end": 22.593,
+        "text": "Their work helped make encounters like these possible, though this person’s own account is absent here."
+      }
+    ]
+  }
+]

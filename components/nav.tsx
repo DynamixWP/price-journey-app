@@ -7,9 +7,10 @@ import { useEffect, useState } from "react";
 type Theme = "light" | "dark";
 
 const navLinks = [
-  { href: "/", label: "Journey Map" },
-  { href: "/timeline", label: "Timeline" },
-  { href: "/collections", label: "Collections" },
+  { href: "/", label: "Journey" },
+  { href: "/concept", label: "Atlas" },
+  { href: "/timeline", label: "Chronology" },
+  { href: "/collections", label: "Archive" },
 ];
 
 export function Nav() {

@@ -2,7 +2,7 @@
 
 Interactive Next.js app to present Weston A. Price's journeys around the world, including stops, annotations, photos, letters, and related archival artifacts.
 
-The main experience is an interactive world map with a chapter sidebar, plus timeline and collection exploration views.
+The main experience is a photographic documentary with scroll-controlled camera movement, an optional guided narrator, and a full-screen globe connected to the archive.
 
 ## Current status
 
@@ -10,7 +10,11 @@ This repository is an MVP frontend focused on validating navigation, interaction
 
 Included MVP surfaces:
 
-- Journey Map (main map + expedition sidebar)
+- Eight documentary scenes centred on Switzerland and New Zealand
+- Eleven narrated photo details, including the expanded Peru and Pacific archive
+- Full-screen globe with eight historical image assets across six destinations
+- Guided photo journey, manual browsing and return to the saved documentary passage
+- Separate, clearly labelled Arctic visual concepts
 - Expedition Chapter
 - Artifact Viewer
 - Collections / Search
@@ -41,12 +45,16 @@ Available scripts:
 - `npm run build` - create production build
 - `npm run start` - run production server
 - `npm run lint` - run ESLint
+- `npm test` - verify audio coverage, subtitle timing, camera geometry and guided route order
+
+Current experience and source notes: [connected documentary](docs/connected-documentary.md), [expanded archive](docs/expanded-archive-sources.md), [atlas narration](docs/atlas-narration-sources.md). Narration is synthetic demo audio; archive locations indicate regional references. The photographs and MP3s are local. Map tiles require network access and WebGL.
 
 ## Routes
 
 | Route | Purpose |
 | --- | --- |
-| `/` | Interactive journey map with year filtering and expedition sidebar |
+| `/` | Photographic documentary, narrated details, connected globe and archive |
+| `/concept` | Redirect to the current photographic experience |
 | `/timeline` | Literal timeline of stops with country/source filters |
 | `/collections` | Artifact search and faceted filtering |
 | `/chapters/[expeditionId]` | Expedition chapter details and stop-level related documents |

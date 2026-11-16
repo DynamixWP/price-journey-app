@@ -1,8 +1,5 @@
-import { JourneyMap } from "@/components/journey-map";
-import { getProject } from "@/lib/data/repository";
+import { PhotoJourney } from "@/components/experience/photo-journey";
 
 export default function Home() {
-  const project = getProject();
-
-  return <JourneyMap project={project} />;
+  return <PhotoJourney />;
 }

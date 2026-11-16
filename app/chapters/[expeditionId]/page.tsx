@@ -1,5 +1,8 @@
+import Image from "next/image";
+import Link from "next/link";
 import { RelatedDocuments } from "@/components/related-documents";
 import { getExpeditionById, getProject } from "@/lib/data/repository";
+import { imageForExpedition } from "@/lib/visuals";
 
 type Props = {
   params: Promise<{ expeditionId: string }>;
@@ -20,30 +23,39 @@ export default async function ExpeditionChapterPage({ params }: Props) {
   }
 
   return (
-    <section className="panel">
-      <h2 className="section-title">{expedition.title}</h2>
-      <p className="meta">{expedition.summary}</p>
-      <div className="chip-row space-top">
-        <span className="chip">{expedition.dateLabel}</span>
-        {expedition.regions.map((region) => (
-          <span className="chip" key={region}>
-            {region}
-          </span>
-        ))}
-      </div>
-
-      <h3 className="section-title space-top">Stops</h3>
-      <ul className="list">
+    <article className="chapter-page">
+      <header className="chapter-hero">
+        <Image src={imageForExpedition(expedition)} alt="Conceptual period recreation" fill priority sizes="100vw" />
+        <div className="chapter-hero__shade" />
+        <div className="chapter-hero__content">
+          <Link href="/" className="chapter-hero__back">← Expedition atlas</Link>
+          <p>Field chapter · {expedition.dateLabel}</p>
+          <h1>{expedition.title}</h1>
+          <span>{expedition.summary}</span>
+        </div>
+        <small>Conceptual period recreation · not an original archive image</small>
+      </header>
+      <section className="chapter-body">
+        <div className="chapter-intro">
+          <p className="chapter-dropcap">{expedition.summary}</p>
+          <div className="chapter-metrics">
+            <span><b>{expedition.stops.length}</b> field stops</span>
+            <span><b>{expedition.metrics.totalArtifacts}</b> records</span>
+            <span><b>{expedition.countries.length}</b> countries</span>
+          </div>
+        </div>
+        <div className="chapter-route-heading"><span>Route log</span><strong>{expedition.regions.join(" · ")}</strong></div>
+        <ol className="chapter-stops">
         {expedition.stops.map((stop) => {
           const country = project.countries.find((item) => item.id === stop.countryId);
           return (
-            <li className="card" key={stop.id}>
-              <p className="card__title">
-                {stop.name} &middot; {country?.name}
-              </p>
-              <p className="meta">
-                lat {stop.lat}, lng {stop.lng}
-              </p>
+            <li key={stop.id}>
+              <div className="chapter-stop__index" />
+              <div className="chapter-stop__heading">
+                <span>{stop.visitDateLabel ?? expedition.dateLabel}</span>
+                <h2>{stop.name}</h2>
+                <p>{country?.name} · {Math.abs(stop.lat).toFixed(2)}°{stop.lat >= 0 ? "N" : "S"}, {Math.abs(stop.lng).toFixed(2)}°{stop.lng >= 0 ? "E" : "W"}</p>
+              </div>
               <RelatedDocuments
                 stopId={stop.id}
                 stopName={stop.name}
@@ -54,7 +66,8 @@ export default async function ExpeditionChapterPage({ params }: Props) {
             </li>
           );
         })}
-      </ul>
-    </section>
+        </ol>
+      </section>
+    </article>
   );
 }
