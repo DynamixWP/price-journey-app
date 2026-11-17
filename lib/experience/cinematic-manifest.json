@@ -1,0 +1,86 @@
+[
+  {
+    "id": "alpine-arrival",
+    "text": "Imagine arriving in an Alpine valley. The mountains rise above a village, and the path draws us closer. This is an artistic reconstruction, a doorway into the archive. Pause at a detail, or follow the journey into an original photograph from Price's Swiss account.",
+    "audio": "/narration/alpine-arrival.mp3",
+    "duration": 20.33,
+    "cues": [
+      {
+        "start": 0.1,
+        "end": 3.317,
+        "text": "Imagine arriving in an Alpine valley."
+      },
+      {
+        "start": 3.317,
+        "end": 8.246,
+        "text": "The mountains rise above a village, and the path draws us closer."
+      },
+      {
+        "start": 8.246,
+        "end": 13.488,
+        "text": "This is an artistic reconstruction, a doorway into the archive."
+      },
+      {
+        "start": 13.488,
+        "end": 20.306,
+        "text": "Pause at a detail, or follow the journey into an original photograph from Price's Swiss account."
+      }
+    ]
+  },
+  {
+    "id": "alpine-church",
+    "text": "A village, a connection. This church is an artistic reconstruction. In Price's Swiss account, the local pastor, Reverend John Siegen, connects the journey to the people of the valley. Open the original photograph to explore that documented story.",
+    "audio": "/narration/alpine-church.mp3",
+    "duration": 19.065,
+    "cues": [
+      {
+        "start": 0.1,
+        "end": 2.834,
+        "text": "A village, a connection."
+      },
+      {
+        "start": 2.834,
+        "end": 6.428,
+        "text": "This church is an artistic reconstruction."
+      },
+      {
+        "start": 6.428,
+        "end": 14.311,
+        "text": "In Price's Swiss account, the local pastor, Reverend John Siegen, connects the journey to the people of the valley."
+      },
+      {
+        "start": 14.311,
+        "end": 19.041,
+        "text": "Open the original photograph to explore that documented story."
+      }
+    ]
+  },
+  {
+    "id": "alpine-landscape",
+    "text": "A landscape of daily life. These layers imagine the depth of an Alpine landscape. Price's account describes hay, rye, and protected forests. The original photograph and its source let us distinguish what was recorded from what we have recreated.",
+    "audio": "/narration/alpine-landscape.mp3",
+    "duration": 19.009,
+    "cues": [
+      {
+        "start": 0.1,
+        "end": 2.99,
+        "text": "A landscape of daily life."
+      },
+      {
+        "start": 2.99,
+        "end": 7.138,
+        "text": "These layers imagine the depth of an Alpine landscape."
+      },
+      {
+        "start": 7.138,
+        "end": 12.28,
+        "text": "Price's account describes hay, rye, and protected forests."
+      },
+      {
+        "start": 12.28,
+        "end": 18.985,
+        "text": "The original photograph and its source let us distinguish what was recorded from what we have recreated."
+      }
+    ]
+  }
+]
