@@ -1,0 +1,74 @@
+[
+  {
+    "url": "https://dl.polyhaven.org/file/ph-assets/Textures/jpg/1k/old_wood_floor/old_wood_floor_diff_1k.jpg",
+    "license": "CC0",
+    "asset": "old_wood_floor",
+    "channel": "color",
+    "source": "https://polyhaven.com/a/old_wood_floor",
+    "file": "public/cinematic/chalet-v2/old_wood_floor-color.jpg"
+  },
+  {
+    "url": "https://dl.polyhaven.org/file/ph-assets/Textures/jpg/1k/old_wood_floor/old_wood_floor_nor_gl_1k.jpg",
+    "license": "CC0",
+    "asset": "old_wood_floor",
+    "channel": "normal",
+    "source": "https://polyhaven.com/a/old_wood_floor",
+    "file": "public/cinematic/chalet-v2/old_wood_floor-normal.jpg"
+  },
+  {
+    "url": "https://dl.polyhaven.org/file/ph-assets/Textures/jpg/1k/old_wood_floor/old_wood_floor_rough_1k.jpg",
+    "license": "CC0",
+    "asset": "old_wood_floor",
+    "channel": "roughness",
+    "source": "https://polyhaven.com/a/old_wood_floor",
+    "file": "public/cinematic/chalet-v2/old_wood_floor-roughness.jpg"
+  },
+  {
+    "url": "https://dl.polyhaven.org/file/ph-assets/Textures/jpg/1k/clay_plaster/clay_plaster_diff_1k.jpg",
+    "license": "CC0",
+    "asset": "clay_plaster",
+    "channel": "color",
+    "source": "https://polyhaven.com/a/clay_plaster",
+    "file": "public/cinematic/chalet-v2/clay_plaster-color.jpg"
+  },
+  {
+    "url": "https://dl.polyhaven.org/file/ph-assets/Textures/jpg/1k/clay_plaster/clay_plaster_nor_gl_1k.jpg",
+    "license": "CC0",
+    "asset": "clay_plaster",
+    "channel": "normal",
+    "source": "https://polyhaven.com/a/clay_plaster",
+    "file": "public/cinematic/chalet-v2/clay_plaster-normal.jpg"
+  },
+  {
+    "url": "https://dl.polyhaven.org/file/ph-assets/Textures/jpg/1k/clay_plaster/clay_plaster_rough_1k.jpg",
+    "license": "CC0",
+    "asset": "clay_plaster",
+    "channel": "roughness",
+    "source": "https://polyhaven.com/a/clay_plaster",
+    "file": "public/cinematic/chalet-v2/clay_plaster-roughness.jpg"
+  },
+  {
+    "url": "https://dl.polyhaven.org/file/ph-assets/Textures/jpg/1k/forest_ground_04/forest_ground_04_diff_1k.jpg",
+    "license": "CC0",
+    "asset": "forest_ground_04",
+    "channel": "color",
+    "source": "https://polyhaven.com/a/forest_ground_04",
+    "file": "public/cinematic/chalet-v2/forest_ground_04-color.jpg"
+  },
+  {
+    "url": "https://dl.polyhaven.org/file/ph-assets/Textures/jpg/1k/forest_ground_04/forest_ground_04_nor_gl_1k.jpg",
+    "license": "CC0",
+    "asset": "forest_ground_04",
+    "channel": "normal",
+    "source": "https://polyhaven.com/a/forest_ground_04",
+    "file": "public/cinematic/chalet-v2/forest_ground_04-normal.jpg"
+  },
+  {
+    "url": "https://dl.polyhaven.org/file/ph-assets/Textures/jpg/1k/forest_ground_04/forest_ground_04_rough_1k.jpg",
+    "license": "CC0",
+    "asset": "forest_ground_04",
+    "channel": "roughness",
+    "source": "https://polyhaven.com/a/forest_ground_04",
+    "file": "public/cinematic/chalet-v2/forest_ground_04-roughness.jpg"
+  }
+]

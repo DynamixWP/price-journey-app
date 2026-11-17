@@ -34,7 +34,7 @@ async def generate(stem):
     manifest_path.write_text(json.dumps(manifest, ensure_ascii=False, indent=2), encoding='utf-8')
 
 async def main():
-    await generate('narration')
-    await generate('detail')
+    for stem in sys.argv[1:] or ['narration', 'detail']:
+        await generate(stem)
 
 asyncio.run(main())

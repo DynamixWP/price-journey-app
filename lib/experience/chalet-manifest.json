@@ -1,0 +1,71 @@
+[
+  {
+    "id": "chalet-camera",
+    "text": "Lift this imagined camera and look at its lens, body and controls. It represents the act of recording a journey. It is not a documented camera owned or used by Weston A. Price.",
+    "audio": "/narration/chalet-camera.mp3",
+    "duration": 14.25,
+    "cues": [
+      {
+        "start": 0.1,
+        "end": 5.604,
+        "text": "Lift this imagined camera and look at its lens, body and controls."
+      },
+      {
+        "start": 5.604,
+        "end": 9.084,
+        "text": "It represents the act of recording a journey."
+      },
+      {
+        "start": 9.084,
+        "end": 14.226,
+        "text": "It is not a documented camera owned or used by Weston A. Price."
+      }
+    ]
+  },
+  {
+    "id": "chalet-bowl",
+    "text": "Turn the bowl to see its rim, interior and foot. This object was modeled for the experience. Its shape and glaze suggest a handmade household vessel, without identifying a particular maker, family or collection.",
+    "audio": "/narration/chalet-bowl.mp3",
+    "duration": 16.438,
+    "cues": [
+      {
+        "start": 0.1,
+        "end": 4.297,
+        "text": "Turn the bowl to see its rim, interior and foot."
+      },
+      {
+        "start": 4.297,
+        "end": 7.834,
+        "text": "This object was modeled for the experience."
+      },
+      {
+        "start": 7.834,
+        "end": 16.414,
+        "text": "Its shape and glaze suggest a handmade household vessel, without identifying a particular maker, family or collection."
+      }
+    ]
+  },
+  {
+    "id": "chalet-photograph",
+    "text": "This virtual print reproduces the supplied Swiss valley photograph identified as Figure One in Price’s book. The paper object and its placement in this house are imagined. Open the original photograph to explore its source and documented context.",
+    "audio": "/narration/chalet-photograph.mp3",
+    "duration": 17.645,
+    "cues": [
+      {
+        "start": 0.1,
+        "end": 7.593,
+        "text": "This virtual print reproduces the supplied Swiss valley photograph identified as Figure One in Price’s book."
+      },
+      {
+        "start": 7.593,
+        "end": 11.982,
+        "text": "The paper object and its placement in this house are imagined."
+      },
+      {
+        "start": 11.982,
+        "end": 17.621,
+        "text": "Open the original photograph to explore its source and documented context."
+      }
+    ]
+  }
+]

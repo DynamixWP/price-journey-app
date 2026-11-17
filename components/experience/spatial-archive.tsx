@@ -18,7 +18,7 @@ const satellite: StyleSpecification = {
   layers: [{ id: "satellite", type: "raster", source: "satellite", paint: { "raster-saturation": -.45, "raster-brightness-max": .8, "raster-fade-duration": 500 } }],
 };
 
-export function SpatialArchive({ motion, onPhoto, initialPhoto, onReturn, bookmark }: { motion: boolean; onPhoto: (index: number) => void; initialPhoto?: number; onReturn: () => void; bookmark: string }) {
+export function SpatialArchive({ motion, onPhoto, initialPhoto, onReturn, bookmark, returnLabel = "Return to documentary" }: { motion: boolean; onPhoto: (index: number) => void; initialPhoto?: number; onReturn: () => void; bookmark: string; returnLabel?: string }) {
   const container = useRef<HTMLDivElement>(null);
   const map = useRef<maplibregl.Map | null>(null);
   const pins = useRef<HTMLButtonElement[]>([]);
@@ -102,7 +102,7 @@ export function SpatialArchive({ motion, onPhoto, initialPhoto, onReturn, bookma
 
   return <section className={`${styles.globe} ${styles.fullscreenGlobe}`} aria-label="Photographic atlas" data-testid="fullscreen-atlas" data-selected={selected !== null}>
     <div ref={container} className={styles.globeCanvas} aria-label="Interactive globe with historical photographs from Europe, the Pacific and Peru" />
-    <header className={styles.atlasNavigation}><button ref={returnButton} onClick={onReturn}><ArrowLeft size={20} /><span>Return to documentary<small>{bookmark}</small></span></button><div>THE PHOTOGRAPHIC ATLAS<small>{photoCount} photographs · {regions.length} places · Your own path</small></div></header>
+    <header className={styles.atlasNavigation}><button ref={returnButton} onClick={onReturn}><ArrowLeft size={20} /><span>{returnLabel}<small>{bookmark}</small></span></button><div>THE PHOTOGRAPHIC ATLAS<small>{photoCount} photographs · {regions.length} places · Your own path</small></div></header>
     {status !== "ready" && <div className={styles.globeLoading} role="status"><div>{status === "loading" ? "Opening a window onto the world…" : "The globe could not connect. The photographs are still available below."}{status === "error" && <button className={styles.worldButton} onClick={() => { setStatus("loading"); setLayer("satellite"); setRetry(retry + 1); }}>Try the globe again</button>}</div></div>}
     <div className={styles.globeHeader}><div className={styles.globeModes}><button aria-pressed={layer === "satellite"} onClick={() => changeLayer("satellite")}><GlobeHemisphereWest size={15} /> Satellite</button><button aria-pressed={layer === "atlas"} onClick={() => changeLayer("atlas")}><MapTrifold size={15} /> Atlas</button></div><button className={styles.worldButton} aria-pressed={orbit} onClick={() => { setSelected(null); setOrbit(!orbit); }}>{orbit ? <Pause size={16}/> : <ArrowsClockwise size={16}/>} Orbit</button><button className={styles.worldButton} onClick={() => { setOrbit(false); setSelected(null); map.current?.flyTo({ center: [-130, 10], zoom: window.innerWidth > 700 ? 1.9 : .85, pitch: 0, bearing: 0, padding: {top: 0, right: 0, bottom: 0, left: 0}, duration: motion && !window.matchMedia("(prefers-reduced-motion: reduce)").matches ? 2200 : 0 }); }}><GlobeHemisphereWest size={17} /> Whole world</button></div>
     {selected === null && <div className={styles.globeIntro}><span>ANOTHER WAY TO WANDER</span><h3>A world of<br /><em>connections.</em></h3><p>Turn the globe. Choose a photograph. Let a place become the beginning of a story.</p></div>}

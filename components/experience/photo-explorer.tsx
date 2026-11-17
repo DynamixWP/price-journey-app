@@ -13,8 +13,8 @@ import styles from "./immersion.module.css";
 const atlasPhotos = Array.from(new Set(regions.flatMap(region => region.photos)));
 type Frame = ReturnType<typeof cameraFrame>;
 
-export function PhotoExplorer({ index, initialDetail, sound, motion, fromAtlas, onSound, onVoice, onClose, onDocumentary, onPhoto, onMap, bookmarks }: {
-  index: number; initialDetail?: string; sound: boolean; motion: boolean; fromAtlas: boolean;
+export function PhotoExplorer({ index, initialDetail, sound, motion, fromAtlas, fromCinema = false, returnLabel, onSound, onVoice, onClose, onDocumentary, onPhoto, onMap, bookmarks }: {
+  index: number; initialDetail?: string; sound: boolean; motion: boolean; fromAtlas: boolean; fromCinema?: boolean; returnLabel?: string;
   onSound: () => void; onVoice: (active: boolean) => void; onClose: () => void; onDocumentary: () => void;
   onPhoto: (index: number) => void; onMap: (index: number) => void;
   bookmarks: Map<string, DetailBookmark>;
@@ -138,9 +138,9 @@ export function PhotoExplorer({ index, initialDetail, sound, motion, fromAtlas, 
     </div>
     <div className={styles.cinemaShade} data-side={side}/>
     <header className={styles.explorerHeader}>
-      <button ref={back} onClick={onClose}><ArrowLeft size={19}/>{fromAtlas ? "Back to the globe" : "Return to documentary"}</button>
+      <button ref={back} onClick={onClose}><ArrowLeft size={19}/>{fromAtlas ? "Back to the globe" : fromCinema ? (returnLabel ?? "Return to living scene") : "Return to documentary"}</button>
       <span>{region?.name ?? "The photographic archive"} / {String(position + 1).padStart(2, "0")} of {gallery.length}</span>
-      <div>{fromAtlas && <button onClick={onDocumentary} title="Resume the documentary from your saved place"><Play size={15}/><span>Resume documentary</span></button>}<button onClick={onSound} aria-label={sound ? "Mute photograph sound" : "Enable photograph sound"}>{sound ? <SpeakerHigh size={20}/> : <SpeakerSlash size={20}/>}</button></div>
+      <div>{(fromAtlas || fromCinema) && <button onClick={onDocumentary} title="Resume the documentary from your saved place"><Play size={15}/><span>Resume documentary</span></button>}<button onClick={onSound} aria-label={sound ? "Mute photograph sound" : "Enable photograph sound"}>{sound ? <SpeakerHigh size={20}/> : <SpeakerSlash size={20}/>}</button></div>
     </header>
     {!point && <div key={index} className={styles.explorerOverview}>
       <span className={styles.storyLabel}>{region?.country ?? image.subtitle}</span><h2>{image.title}</h2><p>{image.description}</p>
