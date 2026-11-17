@@ -19,7 +19,11 @@ export async function createChaletLibrary(scene:THREE.Scene, wood:THREE.Material
   const vertices=bodyGeometry.attributes.position;for(let i=0;i<vertices.count;i++){const x=vertices.getX(i);vertices.setZ(i,.055*(1-Math.pow(x/.54,2)));}bodyGeometry.computeVertexNormals();
   const figure=new THREE.Mesh(bodyGeometry,new THREE.MeshStandardMaterial({map:price,alphaTest:.5,roughness:1,side:THREE.DoubleSide}));figure.position.y=.81;figure.castShadow=true;seated.add(figure);
   const nameplate=new THREE.Mesh(new THREE.PlaneGeometry(.6,.18),new THREE.MeshStandardMaterial({map:label("Weston A. Price"),roughness:1}));nameplate.position.set(.25,.47,-2.34);nameplate.rotation.x=-.3;scene.add(nameplate);
-  const portraitLight=new THREE.PointLight("#ffe9ca",1.1,4,2);portraitLight.position.set(.6,1.8,-1.9);scene.add(portraitLight);
+  const portraitLight=new THREE.PointLight("#ffe6c4",1.5,4.2,2);portraitLight.position.set(.75,1.75,-1.85);scene.add(portraitLight);
+  // A soft contact shadow seats the photographic figure on the floor instead of leaving it floating.
+  const seatShadow=new THREE.Mesh(new THREE.PlaneGeometry(1.15,.8),new THREE.MeshBasicMaterial({map:canvasTexture(ctx=>{const g=ctx.createRadialGradient(128,128,8,128,128,128);g.addColorStop(0,"rgba(14,9,5,.62)");g.addColorStop(1,"rgba(14,9,5,0)");ctx.fillStyle=g;ctx.fillRect(0,0,256,256);},256,256),transparent:true,depthWrite:false}));
+  seatShadow.rotation.x=-Math.PI/2;seatShadow.position.set(.25,.022,-2.6);seatShadow.userData.ignoreRay=true;scene.add(seatShadow);
+  let turned=0,clock=0;
   // Books occupy the existing back cupboard, without reducing the walking aisle.
   const bookColors=["#574838","#52604a","#5b3730","#9a845a","#3d4d51"];
   for(let row=0;row<2;row++)for(let i=0;i<12;i++){const h=.23+(i%3)*.035;box(.10,h,.27,-3.02+i*.115,1.08+row*.30+h/2,-3.39,new THREE.MeshStandardMaterial({color:bookColors[i%5],roughness:.85}));box(.085,.008,.005,-3.02+i*.115,1.12+row*.3,-3.25,brass);}
@@ -54,6 +58,10 @@ export async function createChaletLibrary(scene:THREE.Scene, wood:THREE.Material
   let highlighted:LibraryStation|null=null;
   function select(index:number){index=wrapLibraryIndex(index,records.length);const record=libraryRecords[index];printMat.map=records[index];printMat.emissiveMap=records[index];rearMat.map=sourceTextures[index];rearMat.needsUpdate=true;projectedMat.map=records[index];const fit=(w:number,h:number)=>record.aspect>w/h?[w,w/record.aspect]:[h*record.aspect,h];const [w,h]=fit(.47,.31);print.scale.set(w,h,1);const [sw,sh]=fit(2.12,1.16);projected.scale.set(sw,sh,1);}
   select(0);
-  return {objects,targets,select,setPage(index:number){pageMat.map=pageTextures[wrapLibraryIndex(index,pageTextures.length)];},setLight(value:boolean){printMat.emissiveIntensity=value?.7:.05;},setProjection(value:boolean){projected.visible=value;screenLabel.visible=!value;beam.visible=value;},highlight(id:LibraryStation|null){highlighted=id;marker.visible=!!id;},update(time:number,reduced:boolean){if(highlighted){const target=objects.get(highlighted as ChaletObjectId)??targets.get(highlighted);if(target){target.getWorldPosition(marker.position);marker.position.y+=highlighted==="price"?1.7:.45;marker.rotation.set(0,0,0);marker.scale.setScalar(reduced?1:1+Math.sin(time*2)*.08);}}}};
+  return {objects,targets,select,setPage(index:number){pageMat.map=pageTextures[wrapLibraryIndex(index,pageTextures.length)];},setLight(value:boolean){printMat.emissiveIntensity=value?.7:.05;},setProjection(value:boolean){projected.visible=value;screenLabel.visible=!value;beam.visible=value;},highlight(id:LibraryStation|null){highlighted=id;marker.visible=!!id;},update(time:number,reduced:boolean,viewer:THREE.Vector3){
+    // The cutout turns a little toward the visitor and breathes almost imperceptibly; it never walks or speaks.
+    const dt=Math.min(.1,Math.max(0,time-clock));clock=time;const facing=THREE.MathUtils.clamp(Math.atan2(viewer.x-seated.position.x,viewer.z-seated.position.z),-.48,.48);
+    turned=reduced?facing:THREE.MathUtils.damp(turned,facing,2.2,dt);seated.rotation.y=turned;const breath=reduced?1:1+Math.sin(time*1.15)*.0035;figure.scale.y=breath;figure.position.y=.81*breath;
+    if(highlighted){const target=objects.get(highlighted as ChaletObjectId)??targets.get(highlighted);if(target){target.getWorldPosition(marker.position);marker.position.y+=highlighted==="price"?1.7:.45;marker.rotation.set(0,0,0);marker.scale.setScalar(reduced?1:1+Math.sin(time*2)*.08);}}}};
 }
 export type ChaletLibrary=Awaited<ReturnType<typeof createChaletLibrary>>;

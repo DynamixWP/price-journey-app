@@ -1,0 +1,98 @@
+[
+    {
+        "url":  "https://dl.polyhaven.org/file/ph-assets/Textures/jpg/1k/weathered_plank_siding/weathered_plank_siding_diff_1k.jpg",
+        "license":  "CC0",
+        "asset":  "weathered_plank_siding",
+        "channel":  "color",
+        "source":  "https://polyhaven.com/a/weathered_plank_siding",
+        "file":  "public/cinematic/chalet-v3/weathered_plank_siding-color.webp"
+    },
+    {
+        "url":  "https://dl.polyhaven.org/file/ph-assets/Textures/jpg/1k/weathered_plank_siding/weathered_plank_siding_nor_gl_1k.jpg",
+        "license":  "CC0",
+        "asset":  "weathered_plank_siding",
+        "channel":  "normal",
+        "source":  "https://polyhaven.com/a/weathered_plank_siding",
+        "file":  "public/cinematic/chalet-v3/weathered_plank_siding-normal.webp"
+    },
+    {
+        "url":  "https://dl.polyhaven.org/file/ph-assets/Textures/jpg/1k/weathered_plank_siding/weathered_plank_siding_rough_1k.jpg",
+        "license":  "CC0",
+        "asset":  "weathered_plank_siding",
+        "channel":  "roughness",
+        "source":  "https://polyhaven.com/a/weathered_plank_siding",
+        "file":  "public/cinematic/chalet-v3/weathered_plank_siding-roughness.webp"
+    },
+    {
+        "url":  "https://dl.polyhaven.org/file/ph-assets/Textures/jpg/1k/weathered_planks/weathered_planks_diff_1k.jpg",
+        "license":  "CC0",
+        "asset":  "weathered_planks",
+        "channel":  "color",
+        "source":  "https://polyhaven.com/a/weathered_planks",
+        "file":  "public/cinematic/chalet-v3/weathered_planks-color.webp"
+    },
+    {
+        "url":  "https://dl.polyhaven.org/file/ph-assets/Textures/jpg/1k/weathered_planks/weathered_planks_nor_gl_1k.jpg",
+        "license":  "CC0",
+        "asset":  "weathered_planks",
+        "channel":  "normal",
+        "source":  "https://polyhaven.com/a/weathered_planks",
+        "file":  "public/cinematic/chalet-v3/weathered_planks-normal.webp"
+    },
+    {
+        "url":  "https://dl.polyhaven.org/file/ph-assets/Textures/jpg/1k/weathered_planks/weathered_planks_rough_1k.jpg",
+        "license":  "CC0",
+        "asset":  "weathered_planks",
+        "channel":  "roughness",
+        "source":  "https://polyhaven.com/a/weathered_planks",
+        "file":  "public/cinematic/chalet-v3/weathered_planks-roughness.webp"
+    },
+    {
+        "url":  "https://dl.polyhaven.org/file/ph-assets/Textures/jpg/1k/roof_slates_02/roof_slates_02_diff_1k.jpg",
+        "license":  "CC0",
+        "asset":  "roof_slates_02",
+        "channel":  "color",
+        "source":  "https://polyhaven.com/a/roof_slates_02",
+        "file":  "public/cinematic/chalet-v3/roof_slates_02-color.webp"
+    },
+    {
+        "url":  "https://dl.polyhaven.org/file/ph-assets/Textures/jpg/1k/roof_slates_02/roof_slates_02_nor_gl_1k.jpg",
+        "license":  "CC0",
+        "asset":  "roof_slates_02",
+        "channel":  "normal",
+        "source":  "https://polyhaven.com/a/roof_slates_02",
+        "file":  "public/cinematic/chalet-v3/roof_slates_02-normal.webp"
+    },
+    {
+        "url":  "https://dl.polyhaven.org/file/ph-assets/Textures/jpg/1k/roof_slates_02/roof_slates_02_rough_1k.jpg",
+        "license":  "CC0",
+        "asset":  "roof_slates_02",
+        "channel":  "roughness",
+        "source":  "https://polyhaven.com/a/roof_slates_02",
+        "file":  "public/cinematic/chalet-v3/roof_slates_02-roughness.webp"
+    },
+    {
+        "url":  "https://dl.polyhaven.org/file/ph-assets/Textures/jpg/1k/old_stone_wall/old_stone_wall_diff_1k.jpg",
+        "license":  "CC0",
+        "asset":  "old_stone_wall",
+        "channel":  "color",
+        "source":  "https://polyhaven.com/a/old_stone_wall",
+        "file":  "public/cinematic/chalet-v3/old_stone_wall-color.webp"
+    },
+    {
+        "url":  "https://dl.polyhaven.org/file/ph-assets/Textures/jpg/1k/old_stone_wall/old_stone_wall_nor_gl_1k.jpg",
+        "license":  "CC0",
+        "asset":  "old_stone_wall",
+        "channel":  "normal",
+        "source":  "https://polyhaven.com/a/old_stone_wall",
+        "file":  "public/cinematic/chalet-v3/old_stone_wall-normal.webp"
+    },
+    {
+        "url":  "https://dl.polyhaven.org/file/ph-assets/Textures/jpg/1k/old_stone_wall/old_stone_wall_rough_1k.jpg",
+        "license":  "CC0",
+        "asset":  "old_stone_wall",
+        "channel":  "roughness",
+        "source":  "https://polyhaven.com/a/old_stone_wall",
+        "file":  "public/cinematic/chalet-v3/old_stone_wall-roughness.webp"
+    }
+]

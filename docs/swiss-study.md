@@ -1,5 +1,7 @@
 # The Swiss study — Price, photographs and a connected village
 
+A later pass on arrival, light, object handling and interface is described in [swiss-immersion-pass.md](swiss-immersion-pass.md); it adds a twelfth discovery and replaces the permanent bottom bar described below.
+
 Implemented on `feature/alpine-place-exploration`, extending the existing walkable house. Enter **Walk inside the house → Meet Price in the study**. This is a photographic presence with shallow geometric depth, not a rigged, walking 3D character. The seated body, chair and pose are generated from the supplied portrait; they are not an archival image of Price in this room.
 
 ## A visit
