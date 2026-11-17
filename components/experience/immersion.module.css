@@ -392,3 +392,22 @@
 @media(max-width:800px){.opening{grid-template-columns:1fr;justify-items:start;align-content:center;gap:26px;padding:90px 7% 70px}.openingPortrait{height:auto;width:min(58%,260px);order:-1}.openingCopy p{font-size:36px;margin-top:16px}.openingPortrait figcaption{position:static;margin-top:10px}}
 @media(prefers-reduced-motion:reduce){.opening{display:none}.heroStage [data-hero-part]{opacity:1!important}.heroStage [data-hero-part],.heroStage [data-hero-part]>*{animation:none!important}}
 [data-motion="off"] .opening{transition:none}[data-motion="off"] .opening *,[data-motion="off"] .heroStage [data-hero-part],[data-motion="off"] .heroStage [data-hero-part]>*{animation:none!important}
+/* Globe: guided flight, descent to the valley, and photographs pinned like prints. */
+/* The marker itself is positioned by the map and must never be transformed; only the print inside it tilts and lifts. */.mapPhotoPin{width:auto;padding:0!important;background:transparent!important;border:0!important;box-shadow:none;cursor:pointer}.mapPhotoPin:hover,.mapPhotoPin:focus-visible{z-index:3}.mapPhotoPin[aria-pressed="true"],.mapPhotoPin:focus-visible{outline:none}
+.mapPhotoPin .pinPrint{display:block;position:relative;width:79px;padding:4px;font-size:inherit;background:#ece8dd;color:#192a20;border:1px solid #eee;box-shadow:0 4px 25px #0009;transform-origin:50% 100%;transition:transform .3s ease,box-shadow .3s ease}.mapPhotoPin .pinPrint[data-tilt="0"]{transform:rotate(-2.2deg)}.mapPhotoPin .pinPrint[data-tilt="1"]{transform:rotate(1.6deg)}.mapPhotoPin .pinPrint[data-tilt="2"]{transform:rotate(-.8deg)}
+.mapPhotoPin:hover .pinPrint,.mapPhotoPin:focus-visible .pinPrint,.mapPhotoPin[aria-pressed="true"] .pinPrint{transform:rotate(0deg) scale(1.06);box-shadow:0 12px 34px #000b}.mapPhotoPin[aria-pressed="true"] .pinPrint,.mapPhotoPin:focus-visible .pinPrint{outline:2px solid #e2cda0;outline-offset:3px}
+.globe[data-layer="atlas"] .mapPhotoPin:after{background:#3b3226}
+.globe .flightStart{background:#e8dcb9!important;color:#25392b!important;border-color:#e8dcb9!important;font-weight:500}.globe .flightStart:hover{background:#f5ebd4!important}
+.flightBar{position:absolute;z-index:7;left:36px;bottom:182px;display:flex;align-items:center;gap:6px 14px;flex-wrap:wrap;max-width:min(880px,calc(100% - 420px));padding:12px 16px 15px;background:#0c1913f2;border:1px solid #ddc89666;color:#f4f0e7;backdrop-filter:blur(10px);overflow:hidden;animation:flightIn .4s ease}
+.flightBar button{display:inline-flex;align-items:center;gap:7px;min-height:34px;padding:0 10px;font-size:10px!important}.flightBar button:disabled{opacity:.35}
+.flightBar .flightPlay{background:#e8dcb9!important;color:#25392b!important;padding:0 14px}.flightBar button[aria-pressed="true"]{color:#ecd9a6}
+.flightPlace{font-size:9px;letter-spacing:.14em;min-width:150px}.flightPlace strong{display:block;font-family:var(--font-serif);font-size:21px;font-weight:500;letter-spacing:0;margin-top:3px}
+.flightBar p{flex-basis:100%;margin:2px 0 0;font-size:11px;line-height:1.6;color:#d6dccf;min-height:18px}
+.flightProgress{position:absolute;left:0;bottom:0;height:2px;background:#ddc896;transition:width .6s ease}
+@keyframes flightIn{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:none}}
+.selectedPlace .descend{background:#2f4634!important;color:#f3e8cd!important;border-top:0!important;padding:13px 14px!important;margin-top:16px}.selectedPlace .descend:hover{background:#3d5a43!important}
+.globe>*{transition:opacity .9s ease}.globe[data-descending="true"]>:not(.globeCanvas):not(.descentCaption):not(.globeVeil){opacity:0;pointer-events:none}
+.descentCaption{position:absolute;z-index:7;left:5%;bottom:11%;color:#f4f0e7;text-shadow:0 2px 26px #000;animation:flightIn 1.4s ease 1.2s backwards}.descentCaption span{display:block;font-size:10px;letter-spacing:.2em}.descentCaption strong{display:block;font-family:var(--font-serif);font-weight:400;font-size:clamp(46px,5.5vw,84px);line-height:1;margin:14px 0 12px}.descentCaption small{font-size:10px;color:#d6dccf}
+.globeVeil{position:absolute;inset:0;z-index:9;pointer-events:none;background:#0c1410;opacity:0;transition:opacity .9s ease}.globeVeil[data-on="true"]{opacity:1}
+@media(max-width:900px){.flightBar{left:14px;right:14px;max-width:none;bottom:200px}.flightPlace{min-width:0}}
+@media(prefers-reduced-motion:reduce){.mapPhotoPin .pinPrint,.globe>*,.globeVeil,.flightProgress{transition:none}.flightBar,.descentCaption{animation:none}}
