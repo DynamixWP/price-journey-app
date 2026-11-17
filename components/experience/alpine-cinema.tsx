@@ -8,7 +8,7 @@ import { ExplorationSound } from "@/lib/experience/exploration-sound";
 import narration from "@/lib/experience/exploration-manifest.json";
 import styles from "./alpine-cinema.module.css";
 
-type Props={open:boolean;suspended:boolean;motion:boolean;onVoice:(value:boolean)=>void;onClose:()=>void;onContinue:()=>void;onPhoto:()=>void;onMap:()=>void};
+type Props={onHouse:()=>void;houseOpen:boolean;open:boolean;suspended:boolean;motion:boolean;onVoice:(value:boolean)=>void;onClose:()=>void;onContinue:()=>void;onPhoto:()=>void;onMap:()=>void};
 type Frame=ReturnType<typeof explorationFrame>;
 const loadedPlaces=new Map<PlaceId,Promise<void>>();
 function preparePlace(id:PlaceId):Promise<void>{
@@ -16,7 +16,7 @@ function preparePlace(id:PlaceId):Promise<void>{
   return loadedPlaces.get(id)!;
 }
 
-export function AlpineCinema({open,suspended,motion,onVoice,onClose,onContinue,onPhoto,onMap}:Props){
+export function AlpineCinema({onHouse,houseOpen,open,suspended,motion,onVoice,onClose,onContinue,onPhoto,onMap}:Props){
   const stage=useRef<HTMLElement>(null),back=useRef<HTMLButtonElement>(null),audio=useRef<HTMLAudioElement>(null);
   const images=useRef<(HTMLImageElement|null)[]>([]),pins=useRef<(HTMLButtonElement|null)[]>([]);
   const view=useRef<PlaceView>(initialView()),smoothView=useRef<PlaceView>(initialView()),focus=useRef([.65,.64]);
@@ -43,7 +43,7 @@ export function AlpineCinema({open,suspended,motion,onVoice,onClose,onContinue,o
   },[]);
   useEffect(()=>{for(const point of place.points)if(point.target)void preparePlace(point.target).catch(()=>{});ambience.current?.setPlace(place.environment);},[place]);
   useEffect(()=>{if(!active){audio.current?.pause();onVoice(false);}else back.current?.focus({preventScroll:true});},[active,onVoice]);
-  useEffect(()=>{if(!open)void ambience.current?.pause();else if(ambienceOn)void ambience.current?.play().catch(()=>setAmbienceOn(false));},[open,ambienceOn]);
+  useEffect(()=>{if(!open||houseOpen)void ambience.current?.pause();else if(ambienceOn)void ambience.current?.play().catch(()=>setAmbienceOn(false));},[open,houseOpen,ambienceOn]);
   useEffect(()=>{if(!trail)return;const timer=setTimeout(()=>setTrail(null),animated?850:0);return()=>clearTimeout(timer);},[trail,animated]);
 
   function savePlace(){views.current.set(placeId,{...view.current});if(audio.current)audioTimes.current.set(placeId,audio.current.currentTime);audio.current?.pause();}
@@ -102,7 +102,7 @@ export function AlpineCinema({open,suspended,motion,onVoice,onClose,onContinue,o
     <footer className={styles.dock}>
       {detail&&<div className={styles.detail}><span>A CLOSER LOOK</span><h3>{detail.label}</h3><p>{listening&&subtitle?subtitle:detail.text}</p><button onClick={resetView}><ArrowLeft size={16}/> Step back</button></div>}
       {description&&!detail&&<div className={styles.description}><button className={styles.closeDescription} aria-label="Hide description" onClick={()=>setDescription(false)}><X size={17}/></button><p>{listening&&subtitle?subtitle:place.description}</p><small>Contemporary description · AI-generated place</small></div>}
-      <nav className={styles.paths} aria-label="Paths and details">{place.points.map(point=><button key={point.id} onClick={()=>selectPoint(point)} disabled={busy||!ready}>{point.target?<ArrowRight size={14}/>:<Plus size={14}/>} {point.label}</button>)}</nav>
+      <nav className={styles.paths} aria-label="Paths and details"><button onClick={onHouse}>Walk inside the house <ArrowRight size={14}/></button>{place.points.map(point=><button key={point.id} onClick={()=>selectPoint(point)} disabled={busy||!ready}>{point.target?<ArrowRight size={14}/>:<Plus size={14}/>} {point.label}</button>)}</nav>
       <div className={styles.transport}>
         <div className={styles.walkControls}><button onClick={()=>{moveCloser(view.current.approach+.18);ambience.current?.footstep(placeId==="home"||placeId==="chapel");}} disabled={busy||!ready||approach>=1} aria-label="Step forward"><ArrowRight size={17}/><span>Step closer</span></button><button onClick={resetView} disabled={busy} aria-label="Reset view"><CornersOut size={19}/></button><input aria-label="Move closer" type="range" min="0" max="100" value={Math.round(approach*100)} onChange={event=>moveCloser(Number(event.target.value)/100)} disabled={busy}/></div>
         <button onClick={listen} disabled={busy||!ready} aria-label={listening?"Pause description":time>0&&time<clip.duration-.2?"Resume description":"Listen to description"}>{listening?<Pause size={17}/>:<Headphones size={18}/>}<span>{listening?"Pause description":time>0&&time<clip.duration-.2?"Resume description":"Listen to description"}</span></button>

@@ -18,6 +18,7 @@ import { AlpineCinema } from "./alpine-cinema";
 import cinemaStyles from "./alpine-cinema.module.css";
 
 const SpatialArchive = dynamic(() => import("./spatial-archive").then((module) => module.SpatialArchive), { ssr: false, loading: () => <p className={styles.loading}>Opening the map…</p> });
+const ChaletWalk = dynamic(() => import("./chalet-walk").then(module => module.ChaletWalk), { ssr: false });
 type Panel = "photo" | "archive" | "chapters" | "about" | "sound" | null;
 const sections = ["top", "chapter-one", "switzerland", "new-zealand", "concept-arctic"];
 const chapterNames = ["A world within a photograph", "Prologue · Weston A. Price", "Switzerland · Lötschental", "New Zealand · Rotorua", "Arctic · A separate visual concept"];
@@ -27,6 +28,9 @@ export function PhotoJourney() {
   const [atlasOpen, setAtlasOpen] = useState(false);
   const [cinematicOpen, setCinematicOpen] = useState(false);
   const [cinematicVisited, setCinematicVisited] = useState(false);
+  const [houseOpen, setHouseOpen] = useState(false);
+  const [houseVisited, setHouseVisited] = useState(false);
+  const immersiveOpen = cinematicOpen || houseOpen;
   const cinematicReturn = useRef<{ scroll: number; focus: HTMLElement | null }>({ scroll: 0, focus: null });
   const [atlasPhoto, setAtlasPhoto] = useState<number>();
   const [bookmark, setBookmark] = useState("");
@@ -66,9 +70,9 @@ export function PhotoJourney() {
 
   // The exploratory soundscape has its own opt-in control; suspend the documentary score.
   useEffect(() => {
-    if (cinematicOpen) void score.current?.pause();
+    if (immersiveOpen) void score.current?.pause();
     else if (sound) void score.current?.play().catch(() => setAudioError("The music could not resume. Use Sound to try again."));
-  }, [cinematicOpen, sound]);
+  }, [immersiveOpen, sound]);
 
   useEffect(() => {
     if (!panel || panel === "photo") return;
@@ -77,11 +81,11 @@ export function PhotoJourney() {
     return () => element?.close();
   }, [panel]);
   useEffect(() => {
-    if (!panel && !atlasOpen && !cinematicOpen) return;
+    if (!panel && !atlasOpen && !immersiveOpen) return;
     const previous = document.body.style.overflow;
     document.body.style.overflow = "hidden";
     return () => { document.body.style.overflow = previous; };
-  }, [panel, atlasOpen, cinematicOpen]);
+  }, [panel, atlasOpen, immersiveOpen]);
   const returnToStory = useCallback(() => {
     setAtlasOpen(false);
     requestAnimationFrame(() => { window.scrollTo({ top: returnPoint.current.scroll, behavior: "instant" }); returnPoint.current.focus?.focus({ preventScroll: true }); });
@@ -118,7 +122,7 @@ export function PhotoJourney() {
     if (!atlasOpen) {
       returnPoint.current = { scroll: window.scrollY, focus: document.activeElement as HTMLElement | null };
       const scene = Number(document.querySelector('[data-testid="immersive-stage"]')?.getAttribute("data-scene") ?? 0);
-      setBookmark(`${cinematicOpen ? "An Alpine exploration" : storyBeats[scene].title.replace("\n", " ")} · Your place is saved`);
+      setBookmark(`${houseOpen ? "Inside the Alpine house" : cinematicOpen ? "An Alpine exploration" : storyBeats[scene].title.replace("\n", " ")} · Your place is saved`);
       setAtlasPhoto(imageIndex ?? storyBeats[scene].image);
     } else if (imageIndex !== undefined) setAtlasPhoto(imageIndex);
     setPanel(null); setAtlasOpen(true);
@@ -127,8 +131,15 @@ export function PhotoJourney() {
     cinematicReturn.current = { scroll: window.scrollY, focus: document.activeElement as HTMLElement | null };
     setCinematicVisited(true); setCinematicOpen(true);
   }
+  function openHouse() {
+    if (!cinematicOpen) cinematicReturn.current = { scroll: window.scrollY, focus: document.activeElement as HTMLElement | null };
+    setHouseVisited(true); setHouseOpen(true);
+  }
+  function closeHouse() {
+    if (cinematicOpen) setHouseOpen(false); else closeCinema();
+  }
   function closeCinema(continueStory = false) {
-    setCinematicOpen(false); setAtlasOpen(false); setPanel(null);
+    setHouseOpen(false); setCinematicOpen(false); setAtlasOpen(false); setPanel(null);
     requestAnimationFrame(() => {
       const story = document.getElementById("chapter-one");
       const target = continueStory && story ? Math.max(story.offsetTop, Math.min(cinematicReturn.current.scroll, story.offsetTop + story.offsetHeight - window.innerHeight)) : cinematicReturn.current.scroll;
@@ -141,7 +152,7 @@ export function PhotoJourney() {
     setAudioBusy(true); setAudioError("");
     try {
       if (sound) { await score.current?.pause(); setSound(false); }
-      else { score.current ??= new AmbientScore(); score.current.setVolume(volume / 100); score.current.setDucking(voiceSpeaking.current); score.current.setScene(soundScene.current.index, soundScene.current.intensity); if (!cinematicOpen) await score.current.play(); setSound(true); }
+      else { score.current ??= new AmbientScore(); score.current.setVolume(volume / 100); score.current.setDucking(voiceSpeaking.current); score.current.setScene(soundScene.current.index, soundScene.current.intensity); if (!immersiveOpen) await score.current.play(); setSound(true); }
     } catch { setAudioError("Sound is unavailable in this browser. The full story is available without it."); setSound(false); }
     finally { setAudioBusy(false); }
   }
@@ -153,7 +164,7 @@ export function PhotoJourney() {
   const titles = { photo: item.title, archive: "Follow your curiosity.", chapters: "A journey, at your own pace.", about: "A new way into the archive.", sound: "Make room for the atmosphere." };
 
   return <div className={styles.experience} data-motion={motion ? "on" : "off"}>
-    <div inert={atlasOpen || panel === "photo" || cinematicOpen} aria-hidden={atlasOpen || panel === "photo" || cinematicOpen || undefined}>
+    <div inert={atlasOpen || panel === "photo" || immersiveOpen} aria-hidden={atlasOpen || panel === "photo" || immersiveOpen || undefined}>
     <a className={styles.skipLink} href="#chapter-one">Skip to the story</a>
     <header inert={discoveryActive} aria-hidden={discoveryActive || undefined} data-discovery={discoveryActive} className={`${styles.header} ${active > 0 ? styles.headerSolid : ""}`}>
       <a href="#top" onClick={(event) => { event.preventDefault(); goTo(0); }} className={styles.brand} aria-label="Weston A. Price, return to the beginning"><span>WESTON A. PRICE</span><small>A JOURNEY IN PHOTOGRAPHS</small></a>
@@ -179,7 +190,7 @@ export function PhotoJourney() {
         <p>Every photograph holds a story.<br />Listen. Look closer. Follow your curiosity.</p>
         <div className={styles.heroActions}>
           <button className={styles.outlineButton} onClick={() => { if (!sound) void toggleSound(); setPlayRequest(value => value + 1); }}>Watch the documentary <ArrowDown size={18} /></button>
-          <button className={styles.textButton} onClick={openCinema}>Enter the living scene <ArrowRight size={18} /></button>
+          <button className={styles.textButton} onClick={openHouse}>Walk inside the house <ArrowRight size={18} /></button>
         </div>
       </div>
       <button className={styles.heroHotspot} onClick={() => openPhoto(4, true)}><span><Plus size={20} /></span>Look closer</button>
@@ -188,7 +199,7 @@ export function PhotoJourney() {
 
     <nav hidden={active !== 0} className={`${styles.progressRail} ${active === 1 || active === 3 ? styles.progressDark : ""}`} aria-label="Story progress">{sections.map((id, index) => <button key={id} onClick={() => goTo(index)} aria-label={chapterNames[index]} aria-current={active === index ? "step" : undefined}><span className={styles.progressLabel}>{chapterNames[index]}</span><span className={styles.progressDot} /></button>)}</nav>
 
-    <ScrollJourney motion={motion} sound={sound} suspended={panel !== null || atlasOpen || cinematicOpen} onSound={toggleSound} onPhoto={openPhoto} onMap={openAtlas} onScene={changeScene} onVoice={changeVoice} playRequest={playRequest} onDiscovery={setDiscoveryActive} />
+    <ScrollJourney motion={motion} sound={sound} suspended={panel !== null || atlasOpen || immersiveOpen} onSound={toggleSound} onPhoto={openPhoto} onMap={openAtlas} onScene={changeScene} onVoice={changeVoice} playRequest={playRequest} onDiscovery={setDiscoveryActive} />
     <section className={cinemaStyles.invitation} aria-labelledby="living-scene-title"><div className={cinemaStyles.preview} aria-hidden="true">{["valley", "village", "foreground"].map(name => <img key={name} src={`/cinematic/alpine/${name}.webp`} alt="" loading="lazy" />)}</div><div className={cinemaStyles.invitationCopy}><span>AI-GENERATED RECREATION · SWITZERLAND</span><h2 id="living-scene-title">A village to enter.<br />A world to explore.</h2><p>Wander through an imagined Alpine village. Enter the church and a timber home, follow the stream, and listen to a description only when you choose.</p><button onClick={openCinema}>{cinematicVisited ? "Return to the living scene" : "Enter the living scene"} <ArrowRight size={20} /></button></div></section>
     <section className={immersion.worldInvitation}>
       <div><span>The story has more than one path</span><h2>From a detail.<br /><em>Into a world.</em></h2><p>Pull back from the photograph. Turn the globe, drift between places, and choose where your curiosity takes you next.</p><button onClick={() => openAtlas()}>Explore the living atlas <Compass size={21} /></button></div>
@@ -203,9 +214,10 @@ export function PhotoJourney() {
     {audioError && <div className={styles.audioNotice} role="status">{audioError}<button onClick={() => setAudioError("")} aria-label="Dismiss audio message"><X size={18} /></button></div>}
 
     </div>
-    {cinematicVisited && <AlpineCinema open={cinematicOpen} suspended={atlasOpen || panel !== null} motion={motion} onVoice={changeVoice} onClose={() => closeCinema()} onContinue={() => closeCinema(true)} onPhoto={() => openPhoto(4)} onMap={() => openAtlas(4)} />}
-    {atlasOpen && <div inert={panel === "photo"} aria-hidden={panel === "photo" || undefined}><SpatialArchive motion={motion} initialPhoto={atlasPhoto} onPhoto={openPhoto} onReturn={returnToStory} bookmark={bookmark} returnLabel={cinematicOpen ? "Return to living scene" : undefined} /></div>}
-    {panel === "photo" && <PhotoExplorer index={photo} initialDetail={detailId} sound={sound} motion={motion} fromAtlas={atlasOpen} fromCinema={cinematicOpen} onSound={toggleSound} onVoice={changeVoice} onClose={closePhoto} onDocumentary={() => { if (cinematicOpen) closeCinema(true); else { setPanel(null); if (atlasOpen) returnToStory(); else closePhoto(); } }} onPhoto={openPhoto} onMap={openAtlas} bookmarks={photoBookmarks} />}
+    {cinematicVisited && <AlpineCinema onHouse={openHouse} houseOpen={houseOpen} open={cinematicOpen} suspended={houseOpen || atlasOpen || panel !== null} motion={motion} onVoice={changeVoice} onClose={() => closeCinema()} onContinue={() => closeCinema(true)} onPhoto={() => openPhoto(4)} onMap={() => openAtlas(4)} />}
+    {houseVisited && <ChaletWalk open={houseOpen} suspended={atlasOpen || panel !== null} motion={motion} fromVillage={cinematicOpen} onClose={closeHouse} onDocumentary={() => closeCinema(true)} onMap={() => openAtlas(4)} onPhoto={() => openPhoto(4)} onVoice={changeVoice} />}
+    {atlasOpen && <div inert={panel === "photo"} aria-hidden={panel === "photo" || undefined}><SpatialArchive motion={motion} initialPhoto={atlasPhoto} onPhoto={openPhoto} onReturn={returnToStory} bookmark={bookmark} returnLabel={houseOpen ? "Return to house" : cinematicOpen ? "Return to living scene" : undefined} /></div>}
+    {panel === "photo" && <PhotoExplorer index={photo} initialDetail={detailId} sound={sound} motion={motion} fromAtlas={atlasOpen} fromCinema={immersiveOpen} returnLabel={houseOpen ? "Return to house" : undefined} onSound={toggleSound} onVoice={changeVoice} onClose={closePhoto} onDocumentary={() => { if (immersiveOpen) closeCinema(true); else { setPanel(null); if (atlasOpen) returnToStory(); else closePhoto(); } }} onPhoto={openPhoto} onMap={openAtlas} bookmarks={photoBookmarks} />}
     {panel && panel !== "photo" && <dialog ref={dialog} className={`${styles.dialog} ${panel === "archive" ? styles.largeDialog : ""}`} onCancel={() => setPanel(null)} onClick={(event) => { if (event.target === event.currentTarget) setPanel(null); }} aria-labelledby="panel-title">
       <div className={styles.dialogSurface}>
         <div className={styles.dialogHeading}><div><span className={styles.eyebrow}>A journey in photographs</span><h2 id="panel-title">{titles[panel]}</h2></div><button className={styles.closeButton} onClick={() => setPanel(null)} aria-label="Close panel" autoFocus><X size={24}/></button></div>
