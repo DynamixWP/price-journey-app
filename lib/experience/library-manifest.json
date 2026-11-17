@@ -1,0 +1,303 @@
+[
+  {
+    "id": "library-topic-valley",
+    "text": "Start with the valley photograph. Look for the church, the roofs and the steep mountain slopes, then hold the image in your hands.",
+    "audio": "/narration/library-topic-valley.mp3",
+    "duration": 9.534,
+    "cues": [
+      {
+        "start": 0.1,
+        "end": 3.09,
+        "text": "Start with the valley photograph."
+      },
+      {
+        "start": 3.09,
+        "end": 9.51,
+        "text": "Look for the church, the roofs and the steep mountain slopes, then hold the image in your hands."
+      }
+    ]
+  },
+  {
+    "id": "library-topic-people",
+    "text": "Price names Reverend John Siegen among those who helped his work in Lötschental. Open the Swiss chapter to read about that connection, then follow it to the village church.",
+    "audio": "/narration/library-topic-people.mp3",
+    "duration": 11.551,
+    "cues": [
+      {
+        "start": 0.1,
+        "end": 5.703,
+        "text": "Price names Reverend John Siegen among those who helped his work in Lötschental."
+      },
+      {
+        "start": 5.703,
+        "end": 11.527,
+        "text": "Open the Swiss chapter to read about that connection, then follow it to the village church."
+      }
+    ]
+  },
+  {
+    "id": "library-topic-daily",
+    "text": "The mill and communal oven in Figure 2 connect a photograph to the work of making food. Put the plate in the projector and examine the published image on the wall.",
+    "audio": "/narration/library-topic-daily.mp3",
+    "duration": 11.026,
+    "cues": [
+      {
+        "start": 0.1,
+        "end": 6.201,
+        "text": "The mill and communal oven in Figure 2 connect a photograph to the work of making food."
+      },
+      {
+        "start": 6.201,
+        "end": 11.002,
+        "text": "Put the plate in the projector and examine the published image on the wall."
+      }
+    ]
+  },
+  {
+    "id": "library-topic-archive",
+    "text": "The contemporary photographs supplied by Josh show the plates, drawers and digitization work. Explore these materials alongside the historical images they preserve.",
+    "audio": "/narration/library-topic-archive.mp3",
+    "duration": 12.631,
+    "cues": [
+      {
+        "start": 0.1,
+        "end": 7.309,
+        "text": "The contemporary photographs supplied by Josh show the plates, drawers and digitization work."
+      },
+      {
+        "start": 7.309,
+        "end": 12.607,
+        "text": "Explore these materials alongside the historical images they preserve."
+      }
+    ]
+  },
+  {
+    "id": "library-record-valley",
+    "text": "The church and the clustered roofs sit below the steep valley sides. Price identifies this view as Lötschental. His account describes Swiss fieldwork in 1931 and 1932; the photograph’s precise exposure date is unconfirmed.",
+    "audio": "/narration/library-record-valley.mp3",
+    "duration": 18.455,
+    "cues": [
+      {
+        "start": 0.1,
+        "end": 4.752,
+        "text": "The church and the clustered roofs sit below the steep valley sides."
+      },
+      {
+        "start": 4.752,
+        "end": 8.658,
+        "text": "Price identifies this view as Lötschental."
+      },
+      {
+        "start": 8.658,
+        "end": 18.431,
+        "text": "His account describes Swiss fieldwork in 1931 and 1932; the photograph’s precise exposure date is unconfirmed."
+      }
+    ]
+  },
+  {
+    "id": "library-record-mill",
+    "text": "This published plate pairs a hand mill with a communal bake-oven. Read alongside Price’s Swiss account, it offers a way into the work behind everyday food. This web reproduction is only 375 × 227 pixels; fine detail is limited.",
+    "audio": "/narration/library-record-mill.mp3",
+    "duration": 18.98,
+    "cues": [
+      {
+        "start": 0.1,
+        "end": 4.567,
+        "text": "This published plate pairs a hand mill with a communal bake-oven."
+      },
+      {
+        "start": 4.567,
+        "end": 11.172,
+        "text": "Read alongside Price’s Swiss account, it offers a way into the work behind everyday food."
+      },
+      {
+        "start": 11.172,
+        "end": 18.956,
+        "text": "This web reproduction is only 375 × 227 pixels; fine detail is limited."
+      }
+    ]
+  },
+  {
+    "id": "library-record-portrait",
+    "text": "The supplied portrait is the visual reference for the seated figure in this room. The figure’s body, pose and setting are newly generated. The original portrait’s photographer and date have not been confirmed.",
+    "audio": "/narration/library-record-portrait.mp3",
+    "duration": 14.804,
+    "cues": [
+      {
+        "start": 0.1,
+        "end": 5.249,
+        "text": "The supplied portrait is the visual reference for the seated figure in this room."
+      },
+      {
+        "start": 5.249,
+        "end": 9.723,
+        "text": "The figure’s body, pose and setting are newly generated."
+      },
+      {
+        "start": 9.723,
+        "end": 14.78,
+        "text": "The original portrait’s photographer and date have not been confirmed."
+      }
+    ]
+  },
+  {
+    "id": "library-record-plates",
+    "text": "These are photographs of the collection as it is preserved today. The glass mounts and handwritten labels inspired this interactive cabinet. The images within this photograph are not all identified as Swiss.",
+    "audio": "/narration/library-record-plates.mp3",
+    "duration": 14.435,
+    "cues": [
+      {
+        "start": 0.1,
+        "end": 4.425,
+        "text": "These are photographs of the collection as it is preserved today."
+      },
+      {
+        "start": 4.425,
+        "end": 9.567,
+        "text": "The glass mounts and handwritten labels inspired this interactive cabinet."
+      },
+      {
+        "start": 9.567,
+        "end": 14.411,
+        "text": "The images within this photograph are not all identified as Swiss."
+      }
+    ]
+  },
+  {
+    "id": "library-record-cabinet",
+    "text": "The real collection is organized in small labeled drawers. Our virtual box borrows that way of exploring: choose one item, bring it into the light and keep its source attached to it.",
+    "audio": "/narration/library-record-cabinet.mp3",
+    "duration": 13.057,
+    "cues": [
+      {
+        "start": 0.1,
+        "end": 4.723,
+        "text": "The real collection is organized in small labeled drawers."
+      },
+      {
+        "start": 4.723,
+        "end": 13.033,
+        "text": "Our virtual box borrows that way of exploring: choose one item, bring it into the light and keep its source attached to it."
+      }
+    ]
+  },
+  {
+    "id": "library-page-0",
+    "text": "Price’s published account describes visits to Switzerland in 1931 and 1932. In Lötschental, he credits Reverend John Siegen with assisting his work.  The valley photograph is Figure 1. Its exact exposure date is unconfirmed. The chapter gives a documented human connection for the church in our exploration. The virtual church and this room remain imagined spaces; we are not identifying them as places where these meetings occurred.",
+    "audio": "/narration/library-page-0.mp3",
+    "duration": 33.44,
+    "cues": [
+      {
+        "start": 0.1,
+        "end": 7.152,
+        "text": "Price’s published account describes visits to Switzerland in 1931 and 1932."
+      },
+      {
+        "start": 7.152,
+        "end": 12.55,
+        "text": "In Lötschental, he credits Reverend John Siegen with assisting his work."
+      },
+      {
+        "start": 12.55,
+        "end": 15.675,
+        "text": "The valley photograph is Figure 1."
+      },
+      {
+        "start": 15.675,
+        "end": 19.453,
+        "text": "Its exact exposure date is unconfirmed."
+      },
+      {
+        "start": 19.453,
+        "end": 25.022,
+        "text": "The chapter gives a documented human connection for the church in our exploration."
+      },
+      {
+        "start": 25.022,
+        "end": 33.416,
+        "text": "The virtual church and this room remain imagined spaces; we are not identifying them as places where these meetings occurred."
+      }
+    ]
+  },
+  {
+    "id": "library-page-1",
+    "text": "A hand mill. A communal bake-oven. The published plate connects tools and buildings with everyday work.  Read the image beside its caption and the Swiss chapter. Keep the source in view as you explore. Figure 2 gives us an authentic object reference for the Swiss story. This is a contemporary reading guide, not a facsimile of Price’s notebook or a quotation in his voice.",
+    "audio": "/narration/library-page-1.mp3",
+    "duration": 28.611,
+    "cues": [
+      {
+        "start": 0.1,
+        "end": 2.053,
+        "text": "A hand mill."
+      },
+      {
+        "start": 2.053,
+        "end": 4.425,
+        "text": "A communal bake-oven."
+      },
+      {
+        "start": 4.425,
+        "end": 9.141,
+        "text": "The published plate connects tools and buildings with everyday work."
+      },
+      {
+        "start": 9.141,
+        "end": 13.317,
+        "text": "Read the image beside its caption and the Swiss chapter."
+      },
+      {
+        "start": 13.317,
+        "end": 16.57,
+        "text": "Keep the source in view as you explore."
+      },
+      {
+        "start": 16.57,
+        "end": 21.357,
+        "text": "Figure 2 gives us an authentic object reference for the Swiss story."
+      },
+      {
+        "start": 21.357,
+        "end": 28.587,
+        "text": "This is a contemporary reading guide, not a facsimile of Price’s notebook or a quotation in his voice."
+      }
+    ]
+  },
+  {
+    "id": "library-page-2",
+    "text": "A photograph has more than a scene. It has a material life: paper, glass, labels, drawers and careful handling.  Josh’s supplied photographs show that work of preservation today. Locations and names need evidence. The contemporary archive photos help explain how the collection survives. Uncaptioned negatives stay unassigned; appearance alone does not establish a person’s identity or a Swiss location.",
+    "audio": "/narration/library-page-2.mp3",
+    "duration": 31.85,
+    "cues": [
+      {
+        "start": 0.1,
+        "end": 3.147,
+        "text": "A photograph has more than a scene."
+      },
+      {
+        "start": 3.147,
+        "end": 10.206,
+        "text": "It has a material life: paper, glass, labels, drawers and careful handling."
+      },
+      {
+        "start": 10.206,
+        "end": 14.993,
+        "text": "Josh’s supplied photographs show that work of preservation today."
+      },
+      {
+        "start": 14.993,
+        "end": 18.303,
+        "text": "Locations and names need evidence."
+      },
+      {
+        "start": 18.303,
+        "end": 23.772,
+        "text": "The contemporary archive photos help explain how the collection survives."
+      },
+      {
+        "start": 23.772,
+        "end": 31.826,
+        "text": "Uncaptioned negatives stay unassigned; appearance alone does not establish a person’s identity or a Swiss location."
+      }
+    ]
+  }
+]

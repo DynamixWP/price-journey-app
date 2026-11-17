@@ -7,9 +7,10 @@ import { createChaletWorld, type ChaletWorld } from "./chalet-world";
 import { canWalk, findWalkPath, moveInChalet, tourStops, type ChaletObjectId, type WalkPoint } from "./chalet-layout";
 import { houseActions, walkingVelocity, viewfinderCrop, type HouseAction, type HouseDiscovery } from "./chalet-discoveries";
 import type { HouseSound } from "./chalet-sound";
+import { libraryStations, libraryRecords, libraryPages, wrapLibraryIndex, type LibraryStation } from "./library-content";
 
-export type ChaletState={mode:"guided"|"free";walking:boolean;paused:boolean;stop:number;doorOpen:boolean;inside:boolean;held:ChaletObjectId|null;near:string|null;reachable:ChaletObjectId[];position:WalkPoint;examined:ChaletObjectId[];lamp:boolean;window:boolean;drawer:boolean;discovered:HouseDiscovery[];pointerLocked:boolean;viewfinder:boolean;quality:"balanced"|"cinematic";destination:string};
-export type ChaletCallbacks={onState:(state:ChaletState)=>void;onStep:(inside:boolean)=>void;onError:(message:string)=>void;onEffect:(sound:HouseSound)=>void;onSnapshot:(image:string)=>void;onJournal:()=>void;onHelp:()=>void};
+export type ChaletState={mode:"guided"|"free";walking:boolean;paused:boolean;stop:number;doorOpen:boolean;inside:boolean;held:ChaletObjectId|null;near:string|null;reachable:ChaletObjectId[];position:WalkPoint;examined:ChaletObjectId[];lamp:boolean;window:boolean;drawer:boolean;discovered:HouseDiscovery[];pointerLocked:boolean;viewfinder:boolean;quality:"balanced"|"cinematic";destination:string;record:number;page:number;projecting:boolean;backlit:boolean};
+export type ChaletCallbacks={onState:(state:ChaletState)=>void;onStep:(inside:boolean)=>void;onError:(message:string)=>void;onEffect:(sound:HouseSound)=>void;onSnapshot:(image:string)=>void;onJournal:()=>void;onHelp:()=>void;onLibrary:(station:LibraryStation)=>void};
 type HomeTransform={position:THREE.Vector3;quaternion:THREE.Quaternion;scale:THREE.Vector3};
 
 export class ChaletEngine {
@@ -26,6 +27,7 @@ export class ChaletEngine {
   private yaw=.435;private pitch=-.06;private doorTarget=0;private sensitivity=1;
   private held:ChaletObjectId|null=null;private heldTween=false;private returning:ChaletObjectId|null=null;private homes=new Map<ChaletObjectId,HomeTransform>();
   private afterReturn:(()=>void)|null=null;
+  private pendingStation:LibraryStation|null=null;private record=0;private page=0;private projecting=false;private backlit=false;
   private holdDistance=.82;private examined=new Set<ChaletObjectId>();private discovered=new Set<HouseDiscovery>();
   private mode:"guided"|"free"="guided";private near:string|null=null;private viewfinder=false;private quality:"balanced"|"cinematic"="balanced";
   private mood={lamp:false,window:false,drawer:false};private pendingPick:ChaletObjectId|null=null;private pendingAction:HouseAction|null=null;
@@ -60,12 +62,12 @@ export class ChaletEngine {
   }
   private start(){if(!this.world||this.frame||this.disposed||document.hidden)return;this.previous=0;this.frame=requestAnimationFrame(this.tick);}
   private renderOnce(){if(!this.world||this.disposed)return;if(this.composer&&this.quality==="cinematic")this.composer.render();else this.renderer.render(this.world.scene,this.camera);}
-  private cancelWalk(){this.paused=this.paused||this.path.length>0;this.path=[];this.settling=false;this.pendingPick=null;this.pendingAction=null;}
+  private cancelWalk(){this.paused=this.paused||this.path.length>0;this.path=[];this.settling=false;this.pendingPick=null;this.pendingAction=null;this.pendingStation=null;}
   setMode(mode:"guided"|"free"){this.mode=mode;this.cancelWalk();this.clearInput();this.emit();this.focus();}
   focus(){this.renderer.domElement.focus({preventScroll:true});}
   private walkTo(point:WalkPoint,look:readonly number[],label:string){
     if(!this.world||this.held)return;if(this.returning){this.afterReturn=()=>this.walkTo(point,look,label);return;}
-    this.pendingPick=null;this.pendingAction=null;this.targetPoint={...point};this.targetLook=look;this.destinationName=label;this.mode="guided";this.paused=false;this.settling=false;this.clearInput();
+    this.pendingPick=null;this.pendingAction=null;this.pendingStation=null;this.targetPoint={...point};this.targetLook=look;this.destinationName=label;this.mode="guided";this.paused=false;this.settling=false;this.clearInput();
     this.path=findWalkPath(this.camera.position,point);
     if((this.camera.position.z<3.5)!==(point.z<3.5)){if(!this.doorTarget)this.callbacks.onEffect("door");this.doorTarget=-Math.PI/2;}
     if(!this.path.length)this.callbacks.onError("That spot is blocked. Choose an open part of the floor or one of the nearby places.");
@@ -73,6 +75,18 @@ export class ChaletEngine {
   }
   goTo(stop:number){if(this.returning){this.afterReturn=()=>this.goTo(stop);return;}this.destination=Math.max(0,Math.min(tourStops.length-1,stop));const target=tourStops[this.destination];this.walkTo(target.point,target.look,target.label);}
   goToAction(action:HouseAction){const target=houseActions[action];this.walkTo(target.point,target.look,target.label);}
+  visitLibrary(station:LibraryStation){
+    if(this.held){this.putDown();this.afterReturn=()=>this.visitLibrary(station);return;}
+    if(this.returning){this.afterReturn=()=>this.visitLibrary(station);return;}
+    if(station==="plate"||station==="book"){this.pick(station);return;}
+    const target=libraryStations[station];this.walkTo(target.point,target.look,target.label);this.pendingStation=station;
+  }
+  highlightLibrary(station:LibraryStation|null){this.world?.library.highlight(station);}
+  selectRecord(index:number){this.record=wrapLibraryIndex(index,libraryRecords.length);this.world?.library.select(this.record);this.callbacks.onEffect("paper");this.emit();}
+  turnPage(index:number){this.page=wrapLibraryIndex(index,libraryPages.length);this.world?.library.setPage(this.page);this.callbacks.onEffect("paper");this.emit();}
+  togglePlateLight(){this.backlit=!this.backlit;this.world?.library.setLight(this.backlit);this.callbacks.onEffect("lamp");this.emit();}
+  toggleProjection(){this.projecting=!this.projecting;this.world?.library.setProjection(this.projecting);this.discovered.add("projector");this.callbacks.onEffect("shutter");this.emit();}
+  private arriveLibrary(station:LibraryStation){this.discovered.add(station);this.releaseMouse();this.world?.library.highlight(null);if(station==="projector"&&!this.projecting)this.toggleProjection();this.callbacks.onLibrary(station);this.emit();}
   pauseWalk(){this.cancelWalk();this.clearInput();this.emit();}
   resumeWalk(){this.walkTo(this.targetPoint,this.targetLook,this.destinationName);}
   setTouch(forward:number,right:number){if(forward||right){this.cancelWalk();this.mode="free";}this.touch={forward,right};this.emit();}
@@ -94,15 +108,15 @@ export class ChaletEngine {
     this.ray.set(this.camera.position,position.sub(this.camera.position).normalize());const hit=this.hits()[0];return !!hit&&this.interaction(hit.object)===id;
   }
   action(id:HouseAction){if(this.held)return;if(this.returning){this.afterReturn=()=>this.action(id);return;}if(!this.reachable(id)){this.goToAction(id);this.pendingAction=id;return;}this.cancelWalk();this.mood[id]=!this.mood[id];this.discovered.add(id);this.callbacks.onEffect(id);this.emit();}
-  pick(id:ChaletObjectId){
+  pick(id:ChaletObjectId,afterWalk=false){
     if(!this.world||this.held)return;if(this.returning){this.afterReturn=()=>this.pick(id);return;}
-    if(!this.reachable(id)){this.goTo(3);this.pendingPick=id;return;}
+    if(!this.reachable(id)){if(afterWalk){this.cancelWalk();this.callbacks.onError("Move a little closer to the object, then choose it again.");this.emit();return;}if(id==="plate"||id==="book"){const target=libraryStations[id];this.walkTo(target.point,target.look,target.label);}else this.goTo(3);this.pendingPick=id;return;}
     this.cancelWalk();this.clearInput();this.releaseMouse();this.held=id;this.heldTween=true;this.holdDistance=.82;
-    const object=this.world.objects.get(id)!;this.camera.attach(object);this.inspectionLight.visible=true;this.examined.add(id);this.discovered.add(id);this.callbacks.onEffect(id==="photograph"?"paper":"lift");this.emit();
+    const object=this.world.objects.get(id)!;this.world.library.highlight(null);this.camera.attach(object);this.inspectionLight.visible=true;this.examined.add(id);this.discovered.add(id);this.callbacks.onEffect(id==="photograph"?"paper":"lift");this.emit();
   }
   putDown(){if(!this.held||!this.world)return;this.setViewfinder(false);const object=this.world.objects.get(this.held)!;this.world.scene.attach(object);this.returning=this.held;this.held=null;this.heldTween=false;this.inspectionLight.visible=false;this.callbacks.onEffect("return");this.emit();}
   rotateObject(x:number,y:number){if(!this.held||!this.world||this.viewfinder)return;this.heldTween=false;const object=this.world.objects.get(this.held)!;object.rotation.x+=x;object.rotation.y+=y;}
-  flipPhotograph(){if(this.held!=="photograph")return;this.rotateObject(0,Math.PI);this.callbacks.onEffect("paper");}
+  flipPhotograph(){if(this.held!=="photograph"&&this.held!=="plate")return;this.rotateObject(0,Math.PI);this.callbacks.onEffect("paper");}
   tapBowl(){if(this.held==="bowl")this.callbacks.onEffect("bowl");}
   resetObject(){if(!this.held||!this.world)return;this.heldTween=true;this.holdDistance=.82;}
   setObjectDistance(value:number){this.holdDistance=THREE.MathUtils.clamp(value,.55,1.15);}
@@ -114,7 +128,7 @@ export class ChaletEngine {
     canvas.getContext("2d")!.drawImage(source,crop.x*ratio,crop.y*ratio,crop.width*ratio,crop.height*ratio,0,0,1024,683);
     this.callbacks.onSnapshot(canvas.toDataURL("image/jpeg",.88));this.discovered.add("snapshot");this.callbacks.onEffect("shutter");this.emit();
   }
-  interact(){if(this.held){if(this.viewfinder)this.snapshot();else this.putDown();return;}if(this.near==="door")this.toggleDoor();else if(this.near&&this.near in houseActions)this.action(this.near as HouseAction);else if(this.near)this.pick(this.near as ChaletObjectId);}
+  interact(){if(this.held){if(this.viewfinder)this.snapshot();else this.putDown();return;}if(this.near==="price"||this.near==="projector")this.visitLibrary(this.near);else if(this.near==="door")this.toggleDoor();else if(this.near&&this.near in houseActions)this.action(this.near as HouseAction);else if(this.near)this.pick(this.near as ChaletObjectId);}
   private pointerDown=(event:PointerEvent)=>{if(!this.active)return;this.focus();this.drag={x:event.clientX,y:event.clientY,distance:0};this.renderer.domElement.setPointerCapture(event.pointerId);};
   private pointerMove=(event:PointerEvent)=>{
     if(!this.active)return;const locked=document.pointerLockElement===this.renderer.domElement;if(!this.drag&&!locked)return;
@@ -128,7 +142,7 @@ export class ChaletEngine {
     if(document.pointerLockElement){this.interact();return;}
     const rect=this.renderer.domElement.getBoundingClientRect();this.pointer.set((event.clientX-rect.left)/rect.width*2-1,-(event.clientY-rect.top)/rect.height*2+1);this.ray.setFromCamera(this.pointer,this.camera);
     const hit=this.hits()[0];if(!hit)return;const id=this.interaction(hit.object);
-    if(id==="door")this.toggleDoor();else if(id&&id in houseActions)this.action(id as HouseAction);else if(id)this.pick(id as ChaletObjectId);
+    if(id==="price"||id==="projector")this.visitLibrary(id);else if(id==="door")this.toggleDoor();else if(id&&id in houseActions)this.action(id as HouseAction);else if(id)this.pick(id as ChaletObjectId);
     else if(hit.point.y<.15&&canWalk(hit.point,true))this.walkTo(hit.point,[hit.point.x,1.4,hit.point.z-2],"Following your curiosity");
   };
   private wheel=(event:WheelEvent)=>{if(!this.active||!this.held||this.viewfinder)return;event.preventDefault();this.setObjectDistance(this.holdDistance+event.deltaY*.0007);};
@@ -155,7 +169,7 @@ export class ChaletEngine {
       if(this.path.length){
         const next=this.path[0],distance=Math.hypot(next.x-old.x,next.z-old.z);
         if(distance<.045)this.path.shift();else{const step=Math.min(distance,dt*1.65);dx=(next.x-old.x)/distance*step;dz=(next.z-old.z)/distance*step;const angle=Math.atan2(-(next.x-old.x),-(next.z-old.z));this.yaw+=Math.atan2(Math.sin(angle-this.yaw),Math.cos(angle-this.yaw))*Math.min(1,dt*2.4);this.pitch=THREE.MathUtils.damp(this.pitch,-.04,3,dt);}
-        if(!this.path.length){this.settling=true;if(this.pendingPick){const id=this.pendingPick;this.pendingPick=null;this.pick(id);}else if(this.pendingAction){const id=this.pendingAction;this.pendingAction=null;this.action(id);this.settling=true;}}
+        if(!this.path.length){this.settling=true;if(this.pendingPick){const id=this.pendingPick;this.pendingPick=null;this.pick(id,true);}else if(this.pendingAction){const id=this.pendingAction;this.pendingAction=null;this.action(id);this.settling=true;}else if(this.pendingStation){const id=this.pendingStation;this.pendingStation=null;this.arriveLibrary(id);}}
       }else{
         const forward=Number(this.keys.has("w")||this.keys.has("arrowup"))-Number(this.keys.has("s")||this.keys.has("arrowdown"))+this.touch.forward;
         const right=Number(this.keys.has("d")||this.keys.has("arrowright"))-Number(this.keys.has("a")||this.keys.has("arrowleft"))+this.touch.right;
@@ -175,7 +189,7 @@ export class ChaletEngine {
     this.frame=requestAnimationFrame(this.tick);
   };
   private lookToward(point:readonly number[],factor:number){const dx=point[0]-this.camera.position.x,dz=point[2]-this.camera.position.z,angle=Math.atan2(-dx,-dz);this.yaw+=Math.atan2(Math.sin(angle-this.yaw),Math.cos(angle-this.yaw))*factor;this.pitch=THREE.MathUtils.lerp(this.pitch,Math.atan2(point[1]-this.camera.position.y,Math.hypot(dx,dz)),factor);}
-  private emit(){this.callbacks.onState({mode:this.mode,walking:this.path.length>0,paused:this.paused,stop:this.destination,doorOpen:this.doorTarget!==0,inside:this.camera.position.z<3.4,held:this.held,near:this.near,reachable:this.world&&!this.held?[...this.world.objects.keys()].filter(id=>this.reachable(id)):[],position:{x:this.camera.position.x,z:this.camera.position.z},examined:[...this.examined],...this.mood,discovered:[...this.discovered],pointerLocked:document.pointerLockElement===this.renderer.domElement,viewfinder:this.viewfinder,quality:this.quality,destination:this.destinationName});}
+  private emit(){this.callbacks.onState({mode:this.mode,walking:this.path.length>0,paused:this.paused,stop:this.destination,doorOpen:this.doorTarget!==0,inside:this.camera.position.z<3.4,held:this.held,near:this.near,reachable:this.world&&!this.held?[...this.world.objects.keys()].filter(id=>this.reachable(id)):[],position:{x:this.camera.position.x,z:this.camera.position.z},examined:[...this.examined],...this.mood,discovered:[...this.discovered],pointerLocked:document.pointerLockElement===this.renderer.domElement,viewfinder:this.viewfinder,quality:this.quality,destination:this.destinationName,record:this.record,page:this.page,projecting:this.projecting,backlit:this.backlit});}
   dispose(){
     this.disposed=true;this.setActive(false);this.resize.disconnect();const canvas=this.renderer.domElement;
     canvas.removeEventListener("pointerdown",this.pointerDown);canvas.removeEventListener("pointermove",this.pointerMove);canvas.removeEventListener("pointerup",this.pointerUp);canvas.removeEventListener("pointercancel",this.cancelDrag);canvas.removeEventListener("lostpointercapture",this.cancelDrag);canvas.removeEventListener("wheel",this.wheel);canvas.removeEventListener("webglcontextlost",this.contextLost);

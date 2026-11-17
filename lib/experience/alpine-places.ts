@@ -13,9 +13,9 @@ export const alpinePlaces: AlpinePlace[] = [
     {id:"house-door",label:"Enter the house",x:.21,y:.59,target:"home"},
     {id:"meadow-path",label:"Follow the water",x:.88,y:.57,target:"stream"},
   ] },
-  { id:"chapel", title:"Step into the quiet.", short:"Church", subtitle:"Inside the village church", environment:"chapel", image:"chapel-interior", focus:[.55,.52], description:"Inside this imagined church, daylight crosses the stone floor and touches the wooden pews. Move closer to the altar, or look toward the candle niche. The interior is an artistic invention, not a documented view of a church visited by Price.", points:[
-    {id:"altar",label:"Approach the altar",x:.55,y:.54,text:"Light on plaster, worn stone and carved wood. This small interior is an artistic reconstruction, not an archival photograph."},
-    {id:"candle",label:"Look at the candle niche",x:.86,y:.46,text:"A quiet detail in an imagined room. The light, objects and arrangement were created for this exploration."},
+  { id:"chapel", title:"Step into the quiet.", short:"Church", subtitle:"Inside the village church", environment:"chapel", image:"chapel-interior-interactive", focus:[.55,.52], description:"Inside this imagined church, daylight crosses the stone floor and touches the wooden pews. Move closer to the altar, or look toward the candle niche. The interior is an artistic invention, not a documented view of a church visited by Price.", points:[
+    {id:"altar",label:"A connection with John Siegen",x:.55,y:.54,text:"Price’s Swiss chapter credits Reverend John Siegen with assisting his work in Lötschental. This gives the church a human connection to the journey. This interior is imagined; it is not a documented view of Siegen’s church or a reconstruction of a particular meeting."},
+    {id:"candle",label:"Light a candle",x:.86,y:.46,text:"Leave a small light in this imagined room. The flame remains lit when you return during this visit. Its placement is an artistic interaction, not an archival detail."},
     {id:"church-exit",label:"Step outside",x:.07,y:.55,target:"lane"},
   ] },
   { id:"home", title:"A room of everyday life.", short:"House", subtitle:"Inside a timber home", environment:"home", image:"chalet-interior", focus:[.58,.53], description:"A table, a stove, and a window looking back toward the village. This imagined room invites us to notice ordinary materials and spaces. Move toward the table or look out through the window. No particular family or historical household is represented here.", points:[

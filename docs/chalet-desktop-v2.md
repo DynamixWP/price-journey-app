@@ -1,5 +1,7 @@
 # A house, a world within — desktop exploration v2
 
+The newer [Swiss study](swiss-study.md) adds the photographic presence of Price, archive plates, a reading companion, projection and connected village interactions.
+
 The house is now a compact exploration experience with seven discoveries, easier movement, responsive environmental sound and a functional in-world camera. It remains on `feature/alpine-place-exploration`, separate from the documentary PR.
 
 ## Creative grounding

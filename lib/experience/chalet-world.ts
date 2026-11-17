@@ -1,9 +1,10 @@
 import * as THREE from "three";
 import { RoundedBoxGeometry } from "three/addons/geometries/RoundedBoxGeometry.js";
 import { dressChalet, type RoomMood } from "./chalet-dressing";
+import { createChaletLibrary, type ChaletLibrary } from "./chalet-library";
 import type { ChaletObjectId } from "./chalet-layout";
 
-export type ChaletWorld={scene:THREE.Scene;door:THREE.Group;objects:Map<ChaletObjectId,THREE.Group>;targets:Map<string,THREE.Group>;update:(dt:number,time:number,mood:RoomMood,reduced:boolean)=>void;dispose:()=>void};
+export type ChaletWorld={scene:THREE.Scene;door:THREE.Group;objects:Map<ChaletObjectId,THREE.Group>;targets:Map<string,THREE.Group>;library:ChaletLibrary;update:(dt:number,time:number,mood:RoomMood,reduced:boolean)=>void;dispose:()=>void};
 
 export async function createChaletWorld():Promise<ChaletWorld>{
   const loader=new THREE.TextureLoader();
@@ -89,7 +90,6 @@ export async function createChaletWorld():Promise<ChaletWorld>{
   box(1.8,1.65,.58,-2.35,.825,-3.48,darkWood);
   for(const x of [-2.8,-1.9]){box(.8,.9,.035,x,.55,-3.165,wood);cylinder(.025,.025,.06,x,.65,-3.12,brass).rotation.x=Math.PI/2;}
   for(const y of [1.05,1.35,1.65])box(1.7,.06,.60,-2.35,y,-3.45,wood);
-  for(let i=0;i<7;i++){const plate=cylinder(.13,.13,.025,-2.95+i*.19,1.18,-3.35,cream,scene,24);plate.rotation.x=Math.PI/2;}
   box(.82,.85,.8,-2.95,.47,-1.65,iron);box(.92,.08,.9,-2.95,.92,-1.65,iron);
   box(.52,.44,.035,-2.95,.53,-1.225,brass);box(.46,.38,.04,-2.95,.53,-1.20,iron);
   for(let x=-3.15;x< -2.7;x+=.1)box(.025,.24,.025,x,.51,-1.17,brass);
@@ -98,8 +98,6 @@ export async function createChaletWorld():Promise<ChaletWorld>{
   box(.55,.12,1.65,3.17,.48,1.2,wood);for(const z of [.55,1.85])box(.08,.46,.12,3.17,.23,z,darkWood);
   box(.1,.55,1.7,3.42,.76,1.2,darkWood);
   // A chair behind the table, intentionally outside the guided front aisle.
-  box(.52,.09,.5,.25,.48,-2.65,wood);for(const x of [.04,.46])for(const z of [-2.86,-2.44])box(.06,.47,.06,x,.235,z,darkWood);
-  box(.52,.45,.06,.25,.79,-2.89,wood);
   for(const z of [-.4,1.1]){box(.36,.07,1.1,-3.42,2.1,z,wood);for(let i=0;i<3;i++)cylinder(.075,.065,.17,-3.35,2.22,z-.35+i*.32,cream);}
   const rugMat=new THREE.MeshStandardMaterial({color:"#7e5542",roughness:1});box(1.7,.006,2.0,-1.9,.014,.65,rugMat);
   for(const z of [-.15,.05,1.25,1.45])box(1.68,.008,.05,-1.9,.018,z,cream);
@@ -131,6 +129,7 @@ export async function createChaletWorld():Promise<ChaletWorld>{
   scene.add(new THREE.HemisphereLight("#e7e9df","#75583c",1.45));
   const sun=new THREE.DirectionalLight("#ffe0ab",3.5);sun.position.set(9,7,-7);sun.target.position.set(0,0,-1);sun.castShadow=true;sun.shadow.mapSize.set(2048,2048);sun.shadow.camera.left=-11;sun.shadow.camera.right=11;sun.shadow.camera.top=11;sun.shadow.camera.bottom=-11;sun.shadow.normalBias=.018;sun.shadow.bias=-.00015;scene.add(sun,sun.target);
   const bounce=new THREE.PointLight("#ffdfba",3,12,2);bounce.position.set(1.8,2.5,-1.7);scene.add(bounce);const fill=new THREE.DirectionalLight("#ccd6d3",.65);fill.position.set(-4,5,9);scene.add(fill);
-  const targets=new Map<string,THREE.Group>([...objects,...dressing.targets]);
-  return {scene,door,objects,targets,update:dressing.update,dispose(){const geometries=new Set<THREE.BufferGeometry>(),materials=new Set<THREE.Material>();scene.traverse(object=>{if(object instanceof THREE.Mesh||object instanceof THREE.Points){geometries.add(object.geometry);for(const mat of Array.isArray(object.material)?object.material:[object.material])materials.add(mat);}});geometries.forEach(geometry=>geometry.dispose());materials.forEach(material=>material.dispose());textures.forEach(texture=>texture.dispose());sun.shadow.map?.dispose();}};
+  const library=await createChaletLibrary(scene,paleWood,textures);for(const [id,object] of library.objects)objects.set(id,object);
+  const targets=new Map<string,THREE.Group>([...dressing.targets,...library.targets,...objects]);
+  return {scene,door,objects,targets,library,update(dt,time,mood,reduced){dressing.update(dt,time,mood,reduced);library.update(time,reduced);},dispose(){const geometries=new Set<THREE.BufferGeometry>(),materials=new Set<THREE.Material>();scene.traverse(object=>{if(object instanceof THREE.Mesh||object instanceof THREE.Points){geometries.add(object.geometry);for(const mat of Array.isArray(object.material)?object.material:[object.material])materials.add(mat);}});geometries.forEach(geometry=>geometry.dispose());materials.forEach(material=>material.dispose());textures.forEach(texture=>texture.dispose());sun.shadow.map?.dispose();}};
 }
