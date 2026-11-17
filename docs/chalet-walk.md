@@ -1,5 +1,7 @@
 # Walkable Alpine house
 
+The current desktop version is documented in [chalet-desktop-v2.md](chalet-desktop-v2.md), including seven discoveries, environmental sound, the usable camera and new assets. The notes below describe the initial implementation.
+
 A continuous Three.js scene extends the photographic village: walk from the entrance through a hinged door, explore one furnished room, and lift three objects without leaving the scene. This is an artistic prototype, not a reconstruction of a documented building or Price's possessions.
 
 ## Try it

@@ -1,40 +1,47 @@
 import * as THREE from "three";
+import { RoundedBoxGeometry } from "three/addons/geometries/RoundedBoxGeometry.js";
+import { dressChalet, type RoomMood } from "./chalet-dressing";
 import type { ChaletObjectId } from "./chalet-layout";
 
-export type ChaletWorld={scene:THREE.Scene;door:THREE.Group;objects:Map<ChaletObjectId,THREE.Group>;dispose:()=>void};
+export type ChaletWorld={scene:THREE.Scene;door:THREE.Group;objects:Map<ChaletObjectId,THREE.Group>;targets:Map<string,THREE.Group>;update:(dt:number,time:number,mood:RoomMood,reduced:boolean)=>void;dispose:()=>void};
 
 export async function createChaletWorld():Promise<ChaletWorld>{
   const loader=new THREE.TextureLoader();
-  const [timber,stone,landscape,photo]=await Promise.all([
+  const [timber,stone,landscape,photo,fir]=await Promise.all([
     loader.loadAsync("/cinematic/chalet/aged-timber.webp"),loader.loadAsync("/cinematic/chalet/alpine-stone.webp"),
-    loader.loadAsync("/cinematic/alpine/valley.webp"),loader.loadAsync("/archive-originals/npd-figure-001.jpg"),
+    loader.loadAsync("/cinematic/chalet-v2/alpine-panorama.webp"),loader.loadAsync("/archive-originals/npd-figure-001.jpg"),loader.loadAsync("/cinematic/chalet-v2/alpine-fir.webp"),
   ]);
-  const textures=[timber,stone,landscape,photo];textures.forEach(texture=>{texture.colorSpace=THREE.SRGBColorSpace;texture.anisotropy=4;});
+  const textures=[timber,stone,landscape,photo,fir];textures.forEach(texture=>{texture.colorSpace=THREE.SRGBColorSpace;texture.anisotropy=4;});
   timber.wrapS=timber.wrapT=stone.wrapS=stone.wrapT=THREE.RepeatWrapping;
-  const floorTexture=timber.clone();floorTexture.repeat.set(3,5);textures.push(floorTexture);
+  async function surface(id:string,repeatX:number,repeatY:number){
+    const [map,normalMap,roughnessMap]=await Promise.all(["color","normal","roughness"].map(channel=>loader.loadAsync(`/cinematic/chalet-v2/${id}-${channel}.webp`)));
+    map.colorSpace=THREE.SRGBColorSpace;for(const texture of [map,normalMap,roughnessMap]){texture.wrapS=texture.wrapT=THREE.RepeatWrapping;texture.repeat.set(repeatX,repeatY);texture.anisotropy=4;textures.push(texture);}return {map,normalMap,roughnessMap};
+  }
+  const [floorSurface,plasterSurface,groundSurface]=await Promise.all([surface("old_wood_floor",2,3),surface("clay_plaster",2,2),surface("forest_ground_04",25,25)]);
   const pathTexture=stone.clone();pathTexture.repeat.set(2,5);textures.push(pathTexture);
-  const scene=new THREE.Scene();scene.background=new THREE.Color("#b8c8c7");scene.fog=new THREE.Fog("#b7c4bb",28,65);
-  const wood=new THREE.MeshStandardMaterial({map:timber,color:"#a58b70",roughness:.88,bumpMap:timber,bumpScale:.014});
-  const darkWood=new THREE.MeshStandardMaterial({map:timber,color:"#645344",roughness:.93,bumpMap:timber,bumpScale:.014});
-  const paleWood=new THREE.MeshStandardMaterial({map:timber,color:"#d4b897",roughness:.85});
-  const plaster=new THREE.MeshStandardMaterial({color:"#d6cbb5",roughness:1});
+  const scene=new THREE.Scene();landscape.mapping=THREE.EquirectangularReflectionMapping;scene.background=landscape;scene.environment=landscape;scene.environmentIntensity=.35;scene.backgroundIntensity=.85;scene.backgroundRotation.y=.8;scene.environmentRotation.y=.8;scene.fog=new THREE.Fog("#9d9d85",28,85);
+  const wood=new THREE.MeshStandardMaterial({map:timber,color:"#a79f8e",roughness:.92,bumpMap:timber,bumpScale:.009});
+  const darkWood=new THREE.MeshStandardMaterial({map:timber,color:"#6b6455",roughness:.9,bumpMap:timber,bumpScale:.008});
+  const furnitureMap=floorSurface.map.clone();furnitureMap.repeat.set(1,1);textures.push(furnitureMap);
+  const paleWood=new THREE.MeshStandardMaterial({map:furnitureMap,roughness:.82,color:"#b8a78a",normalMap:floorSurface.normalMap,normalScale:new THREE.Vector2(.3,.3)});
+  const plaster=new THREE.MeshStandardMaterial({...plasterSurface,map:null,color:"#d9cdb4",roughness:1,normalScale:new THREE.Vector2(.3,.3)});
   const stoneMaterial=new THREE.MeshStandardMaterial({map:stone,color:"#aca99c",roughness:1,bumpMap:stone,bumpScale:.035});
   const iron=new THREE.MeshStandardMaterial({color:"#292b28",roughness:.65,metalness:.6});
   const brass=new THREE.MeshStandardMaterial({color:"#ab9060",roughness:.4,metalness:.75});
   const cream=new THREE.MeshStandardMaterial({color:"#d4c3a3",roughness:.8});
   const objects=new Map<ChaletObjectId,THREE.Group>();
   function box(w:number,h:number,d:number,x:number,y:number,z:number,material:THREE.Material=wood,parent:THREE.Object3D=scene){
-    const mesh=new THREE.Mesh(new THREE.BoxGeometry(w,h,d),material);mesh.position.set(x,y,z);mesh.castShadow=true;mesh.receiveShadow=true;parent.add(mesh);return mesh;
+    const mesh=new THREE.Mesh(new RoundedBoxGeometry(w,h,d,2,Math.min(.018,w/6,h/6,d/6)),material);mesh.position.set(x,y,z);mesh.castShadow=true;mesh.receiveShadow=true;parent.add(mesh);return mesh;
   }
   function cylinder(top:number,bottom:number,height:number,x:number,y:number,z:number,material:THREE.Material,parent:THREE.Object3D=scene,segments=24){
     const mesh=new THREE.Mesh(new THREE.CylinderGeometry(top,bottom,height,segments),material);mesh.position.set(x,y,z);mesh.castShadow=true;mesh.receiveShadow=true;parent.add(mesh);return mesh;
   }
   // Ground, approach and a level threshold keep movement continuous across the doorway.
-  box(85,.15,85,0,-.18,0,new THREE.MeshStandardMaterial({color:"#798366",roughness:1}));
+  box(85,.15,85,0,-.18,0,new THREE.MeshStandardMaterial({...groundSurface,color:"#8f9671",roughness:1,normalScale:new THREE.Vector2(.7,.7)}));
   box(2.8,.055,8,0,-.035,7,new THREE.MeshStandardMaterial({map:pathTexture,color:"#c1bda9",roughness:1,bumpMap:pathTexture,bumpScale:.025}));
   box(8,.22,8,0,-.16,-.25,stoneMaterial);
-  box(7.2,.10,7.1,0,-.045,-.25,new THREE.MeshStandardMaterial({map:floorTexture,color:"#baa080",roughness:.88,bumpMap:floorTexture,bumpScale:.012}));
-  for(let x=-3.4;x<3.5;x+=.32)box(.012,.006,7.1,x,.009,-.25,darkWood);
+  box(7.2,.10,7.1,0,-.045,-.25,new THREE.MeshStandardMaterial({...floorSurface,color:"#d5c7a7",roughness:.85,normalScale:new THREE.Vector2(.5,.5)}));
+
   box(3.4,.08,1.3,0,-.02,4.1,stoneMaterial);
   // Timber front with a real doorway.
   for(const [x,width] of [[-2.4,3.0],[2.4,3.0]])box(width,3.2,.26,x,1.6,3.5,wood);
@@ -65,7 +72,7 @@ export async function createChaletWorld():Promise<ChaletWorld>{
     for(const dy of [-.75,.75])box(2.3,.12,.18,0,dy,0,darkWood,group);
     box(.065,1.4,.11,0,0,0,paleWood,group);box(2.2,.065,.11,0,0,0,paleWood,group);
     box(2.5,.1,.42,0,-.82,.02,wood,group);
-    const glass=new THREE.Mesh(new THREE.PlaneGeometry(2.1,1.35),new THREE.MeshStandardMaterial({color:"#e0ecdb",transparent:true,opacity:.08,roughness:.15,side:THREE.DoubleSide}));group.add(glass);
+    const glass=new THREE.Mesh(new THREE.PlaneGeometry(2.1,1.35),new THREE.MeshStandardMaterial({color:"#e0ecdb",transparent:true,opacity:.08,roughness:.15,side:THREE.DoubleSide}));glass.userData.ignoreRay=true;group.add(glass);
   }
   windowFrame(2,-3.99,false);windowFrame(3.79,-1.7,true);
   // Door leaf: all meshes share an interactive parent at the actual hinge.
@@ -114,13 +121,16 @@ export async function createChaletWorld():Promise<ChaletWorld>{
   box(.38,.24,.006,0,0,0,new THREE.MeshStandardMaterial({color:"#e8ddc0",roughness:.95}),photograph);
   const print=new THREE.Mesh(new THREE.PlaneGeometry(.34,.186),new THREE.MeshStandardMaterial({map:photo,roughness:.85}));print.position.z=.004;photograph.add(print);
   photograph.rotation.set(-Math.PI/2,0,-.16);photograph.position.set(.65,.925,-.94);scene.add(photograph);objects.set("photograph",photograph);
-  // A distant landscape is an explicitly generated backdrop; the house and objects are geometry.
-  const backdropMaterial=new THREE.MeshBasicMaterial({map:landscape,color:"#c7cfbf",side:THREE.DoubleSide});
-  for(const [x,z,angle] of [[0,-28,0],[0,29,Math.PI],[-29,0,Math.PI/2],[29,0,-Math.PI/2]]){const backdrop=new THREE.Mesh(new THREE.PlaneGeometry(68,35),backdropMaterial);backdrop.position.set(x,11,z);backdrop.rotation.y=angle;scene.add(backdrop);}
-  // Low stone garden edges and conifers frame the approach without blocking the path.
-  for(const side of [-1,1]){box(.4,.45,6,side*2.25,.18,7,stoneMaterial);for(let i=0;i<4;i++){const x=side*(5+i*.6),z=6-i*3;cylinder(.14,.22,2,x,.9,z,darkWood);for(let level=0;level<3;level++){const crown=new THREE.Mesh(new THREE.ConeGeometry(1.25-level*.25,2.6,11),new THREE.MeshStandardMaterial({color:level%2?"#405a3d":"#334c35",roughness:1}));crown.position.set(x,2+level*.8,z);crown.castShadow=true;scene.add(crown);}}}
-  scene.add(new THREE.HemisphereLight("#e4eee4","#806347",2.25));
-  const sun=new THREE.DirectionalLight("#fff0cf",3.1);sun.position.set(8,11,6);sun.target.position.set(0,0,-1);sun.castShadow=true;sun.shadow.mapSize.set(2048,2048);sun.shadow.camera.left=-12;sun.shadow.camera.right=12;sun.shadow.camera.top=12;sun.shadow.camera.bottom=-12;sun.shadow.normalBias=.025;sun.shadow.bias=-.0002;scene.add(sun,sun.target);
-  const bounce=new THREE.PointLight("#ffdfb3",7,12,2);bounce.position.set(0,2.65,0);scene.add(bounce);
-  return {scene,door,objects,dispose(){const geometries=new Set<THREE.BufferGeometry>(),materials=new Set<THREE.Material>();scene.traverse(object=>{if(object instanceof THREE.Mesh){geometries.add(object.geometry);for(const mat of Array.isArray(object.material)?object.material:[object.material])materials.add(mat);}});geometries.forEach(geometry=>geometry.dispose());materials.forEach(material=>material.dispose());textures.forEach(texture=>texture.dispose());sun.shadow.map?.dispose();}};
+  const dressing=dressChalet(scene,paleWood,brass,textures);
+  const reverse=new THREE.Mesh(new THREE.PlaneGeometry(.34,.21),new THREE.MeshStandardMaterial({map:dressing.backTexture,roughness:1}));reverse.rotation.y=Math.PI;reverse.position.z=-.004;photograph.add(reverse);
+  // Photographic foliage cutouts and instanced grass replace the geometric cone trees.
+  const foliage=new THREE.MeshStandardMaterial({map:fir,alphaTest:.45,side:THREE.DoubleSide,roughness:1,color:"#aaa995"});
+  for(const side of [-1,1]){box(.4,.45,6,side*2.25,.18,7,stoneMaterial);for(let i=0;i<7;i++){const x=side*(6+i*.7),z=9-i*3.4,height=7+(i%3)*1.3;for(const angle of [0,Math.PI/2]){const tree=new THREE.Mesh(new THREE.PlaneGeometry(height*.66,height),foliage);tree.position.set(x,height/2-.08,z);tree.rotation.y=angle+i*.7;tree.castShadow=true;scene.add(tree);}}}
+  const grassGeometry=new THREE.BufferGeometry();grassGeometry.setAttribute("position",new THREE.Float32BufferAttribute([-.018,0,0,.018,0,0,.008,.24,.015],3));grassGeometry.computeVertexNormals();const grassMaterial=new THREE.MeshStandardMaterial({color:"#727650",side:THREE.DoubleSide,roughness:1});const grass=new THREE.InstancedMesh(grassGeometry,grassMaterial,900),dummy=new THREE.Object3D();
+  for(let i=0;i<900;i++){const side=i%2?1:-1,x=side*(2.65+((Math.sin(i*56.7)+1)*.5)*8),z=4+((Math.sin(i*93.1)+1)*.5)*13;dummy.position.set(x,.04+Math.abs(Math.sin(i))*.08,z);dummy.rotation.set(.1,Math.sin(i*23)*Math.PI,.2*Math.sin(i));dummy.scale.setScalar(.6+Math.abs(Math.sin(i*5)));dummy.updateMatrix();grass.setMatrixAt(i,dummy.matrix);}grass.userData.ignoreRay=true;scene.add(grass);
+  scene.add(new THREE.HemisphereLight("#e7e9df","#75583c",1.45));
+  const sun=new THREE.DirectionalLight("#ffe0ab",3.5);sun.position.set(9,7,-7);sun.target.position.set(0,0,-1);sun.castShadow=true;sun.shadow.mapSize.set(2048,2048);sun.shadow.camera.left=-11;sun.shadow.camera.right=11;sun.shadow.camera.top=11;sun.shadow.camera.bottom=-11;sun.shadow.normalBias=.018;sun.shadow.bias=-.00015;scene.add(sun,sun.target);
+  const bounce=new THREE.PointLight("#ffdfba",3,12,2);bounce.position.set(1.8,2.5,-1.7);scene.add(bounce);const fill=new THREE.DirectionalLight("#ccd6d3",.65);fill.position.set(-4,5,9);scene.add(fill);
+  const targets=new Map<string,THREE.Group>([...objects,...dressing.targets]);
+  return {scene,door,objects,targets,update:dressing.update,dispose(){const geometries=new Set<THREE.BufferGeometry>(),materials=new Set<THREE.Material>();scene.traverse(object=>{if(object instanceof THREE.Mesh||object instanceof THREE.Points){geometries.add(object.geometry);for(const mat of Array.isArray(object.material)?object.material:[object.material])materials.add(mat);}});geometries.forEach(geometry=>geometry.dispose());materials.forEach(material=>material.dispose());textures.forEach(texture=>texture.dispose());sun.shadow.map?.dispose();}};
 }
