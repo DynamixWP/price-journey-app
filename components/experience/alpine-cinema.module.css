@@ -67,3 +67,8 @@
 @media(min-aspect-ratio:3/2) and (min-width:1000px){.paths{display:none}.swissTrail{border-top:0;margin-bottom:4px}}
 .cinema[data-motion="false"] .veil{transition:none}
 @media(prefers-reduced-motion:reduce){.veil{transition:none}}
+/* Arriving from the globe: the valley fades in from the same darkness the descent ended in. */
+.arrival{position:absolute;inset:0;z-index:5;pointer-events:none;background:#0c1410;opacity:0;animation:valleyArrives 1.5s ease .1s backwards}
+@keyframes valleyArrives{from{opacity:1}to{opacity:0}}
+.cinema[data-motion="false"] .arrival{animation:none}
+@media(prefers-reduced-motion:reduce){.arrival{animation:none}}
