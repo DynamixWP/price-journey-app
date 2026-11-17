@@ -371,3 +371,24 @@
  .inlinePassage[data-gallery="true"] .inlineCopy h2 { font-size:36px; }
 }
 @media(prefers-reduced-motion:reduce) { .explorerCurrent,.explorerTrail { animation:none!important; } }
+/* Documentary opening on the home: a living portrait and a line of the prologue, then the valley and the title. */
+.opening{position:absolute;inset:0;z-index:5;display:grid;grid-template-columns:minmax(0,1fr) auto;align-items:center;gap:7vw;padding:70px 11% 40px 6%;overflow:hidden;background:#070a09;color:#f4efe2;cursor:pointer;transition:opacity 1.9s ease,visibility 0s linear 1.9s}
+.opening[data-done=true]{opacity:0;visibility:hidden;pointer-events:none}
+.openingGlow{position:absolute;inset:-12%;width:124%;height:124%;max-width:none;object-fit:cover;filter:blur(70px) brightness(.32) saturate(.5);z-index:-1}
+.openingCopy{animation:openingIn 1.6s ease .4s backwards}
+.openingCopy span{display:block;font-size:11px;letter-spacing:.23em;text-transform:uppercase;color:#d8d2c0}
+.openingCopy p{font-family:var(--font-serif),Georgia,serif;font-style:italic;font-weight:500;font-size:clamp(38px,4.6vw,74px);line-height:1.04;letter-spacing:-.03em;margin:26px 0 0;animation:openingIn 1.8s ease 1.7s backwards}
+.openingPortrait{position:relative;margin:0;height:min(70%,660px);aspect-ratio:560/752;box-shadow:0 30px 120px #000c;animation:openingIn 2.4s ease .9s backwards}
+.openingPortrait video{display:block;width:100%;height:100%;object-fit:cover;filter:sepia(.16) contrast(1.05)}
+.openingPortrait::after{content:"";position:absolute;inset:0;box-shadow:inset 0 0 90px #000a;pointer-events:none}
+.openingPortrait figcaption{position:absolute;left:0;right:0;top:calc(100% + 13px);font-size:9px;line-height:1.7;letter-spacing:.06em;color:#bcb7a6}
+.openingSkip{position:absolute;right:4.3%;bottom:27px;display:inline-flex;align-items:center;gap:8px;min-height:32px;font-size:10px;letter-spacing:.06em;color:#e6e4dc;animation:openingIn 1s ease 2.4s backwards}
+.openingSkip:focus-visible{outline:2px solid #f5d59a;outline-offset:5px}
+.heroStage[data-opening=true] [data-hero-part]{opacity:0}
+.heroStage[data-opening=false] [data-hero-part="copy"]>*{animation:openingIn 1.2s ease backwards}
+.heroStage[data-opening=false] [data-hero-part="copy"]>*:nth-child(1){animation-delay:.5s}.heroStage[data-opening=false] [data-hero-part="copy"]>*:nth-child(2){animation-delay:.9s}.heroStage[data-opening=false] [data-hero-part="copy"]>*:nth-child(3){animation-delay:1.6s}.heroStage[data-opening=false] [data-hero-part="copy"]>*:nth-child(4){animation-delay:2.2s}
+.heroStage[data-opening=false] [data-hero-part="aside"]{animation:openingIn 1.2s ease 2.8s backwards}
+@keyframes openingIn{from{opacity:0;transform:translateY(14px)}to{opacity:1;transform:none}}
+@media(max-width:800px){.opening{grid-template-columns:1fr;justify-items:start;align-content:center;gap:26px;padding:90px 7% 70px}.openingPortrait{height:auto;width:min(58%,260px);order:-1}.openingCopy p{font-size:36px;margin-top:16px}.openingPortrait figcaption{position:static;margin-top:10px}}
+@media(prefers-reduced-motion:reduce){.opening{display:none}.heroStage [data-hero-part]{opacity:1!important}.heroStage [data-hero-part],.heroStage [data-hero-part]>*{animation:none!important}}
+[data-motion="off"] .opening{transition:none}[data-motion="off"] .opening *,[data-motion="off"] .heroStage [data-hero-part],[data-motion="off"] .heroStage [data-hero-part]>*{animation:none!important}

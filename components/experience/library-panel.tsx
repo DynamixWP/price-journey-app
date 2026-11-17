@@ -6,6 +6,7 @@ import { ArrowLeft, ArrowRight, Headphones, Pause, X } from "@phosphor-icons/rea
 import { libraryPages, libraryRecords, libraryTopics, priceBookSource, type LibraryTopic } from "@/lib/experience/library-content";
 import styles from "./library-panel.module.css";
 import libraryNarration from "@/lib/experience/library-manifest.json";
+import { sheetLabels, sheetSets, type SheetSetId } from "@/lib/experience/story-content";
 const readingBookmarks=new Map<string,number>();
 
 export function LibraryReader({text,active,onVoice}:{text:string;active:boolean;onVoice:(value:boolean)=>void}) {
@@ -28,6 +29,11 @@ export function LibraryPanel({mode,record,projecting,active,onClose,onTopic,onSe
   </aside>;
 }
 function RecordPicker({record,onSelect}:{record:number;onSelect:(index:number)=>void}){return <><div className={styles.recordNav}><button onClick={()=>onSelect(record-1)} aria-label="Previous archive plate"><ArrowLeft size={16}/></button><span>PLATE {String(record+1).padStart(2,"0")} / {libraryRecords.length}</span><button onClick={()=>onSelect(record+1)} aria-label="Next archive plate"><ArrowRight size={16}/></button></div><nav className={styles.records} aria-label="Library archive records">{libraryRecords.map((item,index)=><button key={item.id} aria-pressed={record===index} onClick={()=>onSelect(index)} aria-label={`Select archive record: ${item.title}`}><img src={item.image} alt=""/><span>{String(index+1).padStart(2,"0")}</span></button>)}</nav></>;}
+/** Controls for a real sheet in the hands: which one, its account, its source, and where it leads. */
+export function StorySheetControls({set,index,onSelect,onFlip,onZoom,onGlobe}:{set:SheetSetId;index:number;onSelect:(index:number)=>void;onFlip:()=>void;onZoom:()=>void;onGlobe:()=>void}){
+  const records=sheetSets[set],item=records[index]??records[0];
+  return <div className={styles.objectContent}><h3>{item.title}</h3><span className={styles.recordKind}>{item.kind}</span><p>{item.text}</p><div className={styles.recordNav}><button onClick={()=>onSelect(index-1)} aria-label="Previous sheet"><ArrowLeft size={16}/></button><span>{sheetLabels[set].noun} {index+1} / {records.length}</span><button onClick={()=>onSelect(index+1)} aria-label="Next sheet"><ArrowRight size={16}/></button></div><div className={styles.actions}><button onClick={onFlip}>Turn over · Source label</button><button onClick={onZoom}>Look closer</button>{set==="maps"&&<button onClick={onGlobe}>Find these places on the globe <ArrowRight size={14}/></button>}</div><details className={styles.source}><summary>Image & source</summary><p>{item.source}</p><small>{item.local}</small>{item.url&&<a href={item.url} target="_blank" rel="noreferrer">Read the published source ↗</a>}<p>The paper sheet and its place in this room are recreated.</p></details></div>;
+}
 function SourceRecord({record}:{record:number}){const item=libraryRecords[record];return <details className={styles.source}><summary>Image & source</summary><p>{item.source}</p><small>{item.local}</small>{item.url&&<a href={item.url} target="_blank" rel="noreferrer">Read the published source ↗</a>}<p>The virtual mount and its placement are recreated.</p></details>;}
 export function LibraryObjectControls({kind,record,page,backlit,onSelect,onPage,onFlip,onLight,onZoom,onProject,active,onVoice}:{kind:"plate"|"book";record:number;page:number;backlit:boolean;onSelect:(index:number)=>void;onPage:(index:number)=>void;onFlip:()=>void;onLight:()=>void;onZoom:()=>void;onProject:()=>void;active:boolean;onVoice:(value:boolean)=>void}){
   const item=libraryRecords[record],reading=libraryPages[page];

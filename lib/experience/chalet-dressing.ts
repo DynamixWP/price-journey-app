@@ -17,6 +17,10 @@ export function dressChalet(scene:THREE.Scene,wood:THREE.Material,brass:THREE.Ma
   const flame=new THREE.Mesh(new THREE.SphereGeometry(.025,16,16),flameMaterial);flame.scale.y=2.8;flame.position.y=.33;lamp.add(flame);
   const lampLight=new THREE.PointLight("#ffbd72",0,6,2);lampLight.position.set(1.73,1.38,-1.76);scene.add(lampLight);
   const control=cylinder(.025,.035,.105,.18,0,brass,lamp);control.rotation.z=Math.PI/2;
+  // Embers behind the stove door: a low, restless warmth that reaches the floor and the nearby timber.
+  const emberMaterial=new THREE.MeshStandardMaterial({color:"#3a1a0c",emissive:"#ff6a24",emissiveIntensity:1.4,roughness:1});
+  const ember=new THREE.Mesh(new THREE.PlaneGeometry(.4,.3),emberMaterial);ember.position.set(-2.95,.53,-1.176);ember.userData.ignoreRay=true;scene.add(ember);
+  const emberLight=new THREE.PointLight("#ff8440",.9,3.4,2);emberLight.position.set(-2.95,.5,-.85);scene.add(emberLight);
 
   const drawer=new THREE.Group();drawer.position.set(-2.35,1.37,-3.13);drawer.userData.interaction="drawer";drawer.userData.reachPoint=[0,0,.16];scene.add(drawer);targets.set("drawer",drawer);
   box(1.55,.2,.09,0,0,0,wood,drawer);box(1.48,.035,.56,0,-.085,-.27,wood,drawer);
@@ -47,12 +51,14 @@ export function dressChalet(scene:THREE.Scene,wood:THREE.Material,brass:THREE.Ma
   const shadowCanvas=document.createElement("canvas");shadowCanvas.width=shadowCanvas.height=128;const sc=shadowCanvas.getContext("2d")!,gradient=sc.createRadialGradient(64,64,5,64,64,64);gradient.addColorStop(0,"rgba(18,12,6,.55)");gradient.addColorStop(1,"rgba(18,12,6,0)");sc.fillStyle=gradient;sc.fillRect(0,0,128,128);const shadowTexture=new THREE.CanvasTexture(shadowCanvas);textures.push(shadowTexture);
   for(const [x,z,w,d] of [[.7,-1.35,3.8,2.6],[-2.95,-1.65,1.5,1.6],[-2.35,-3.4,2.5,1.1],[3.17,1.2,1.1,2.2]]){const shadow=new THREE.Mesh(new THREE.PlaneGeometry(w,d),new THREE.MeshBasicMaterial({map:shadowTexture,transparent:true,depthWrite:false}));shadow.rotation.x=-Math.PI/2;shadow.position.set(x,.019,z);shadow.userData.ignoreRay=true;scene.add(shadow);}
   const dustGeometry=new THREE.BufferGeometry(),dustPositions=new Float32Array(180*3);for(let i=0;i<180;i++){dustPositions[i*3]=(Math.sin(i*97.13)*.5+.5)*5-2;dustPositions[i*3+1]=(Math.sin(i*19.61)*.5+.5)*2.5+.3;dustPositions[i*3+2]=(Math.sin(i*31.79)*.5+.5)*5-3;}
-  dustGeometry.setAttribute("position",new THREE.BufferAttribute(dustPositions,3));const dustCanvas=document.createElement("canvas");dustCanvas.width=dustCanvas.height=32;const dc=dustCanvas.getContext("2d")!,dg=dc.createRadialGradient(16,16,0,16,16,16);dg.addColorStop(0,"rgba(255,244,210,.9)");dg.addColorStop(1,"rgba(255,244,210,0)");dc.fillStyle=dg;dc.fillRect(0,0,32,32);const dustMap=new THREE.CanvasTexture(dustCanvas);textures.push(dustMap);const dust=new THREE.Points(dustGeometry,new THREE.PointsMaterial({map:dustMap,color:"#f3dba0",size:.014,transparent:true,opacity:.2,depthWrite:false}));dust.userData.ignoreRay=true;scene.add(dust);
+  dustGeometry.setAttribute("position",new THREE.BufferAttribute(dustPositions,3));const dustCanvas=document.createElement("canvas");dustCanvas.width=dustCanvas.height=32;const dc=dustCanvas.getContext("2d")!,dg=dc.createRadialGradient(16,16,0,16,16,16);dg.addColorStop(0,"rgba(255,244,210,.9)");dg.addColorStop(1,"rgba(255,244,210,0)");dc.fillStyle=dg;dc.fillRect(0,0,32,32);const dustMap=new THREE.CanvasTexture(dustCanvas);textures.push(dustMap);const dust=new THREE.Points(dustGeometry,new THREE.PointsMaterial({map:dustMap,color:"#f6dfa8",size:.015,transparent:true,opacity:.26,depthWrite:false,blending:THREE.AdditiveBlending}));dust.userData.ignoreRay=true;scene.add(dust);
   const backTexture=labelTexture(["LÖTSCHENTAL VALLEY","Switzerland · Figure 1","Nutrition and Physical Degeneration","Weston A. Price · published 1939","Source image supplied by ANF","This paper object is a recreation."]);
   return {targets,backTexture,update(dt:number,time:number,mood:RoomMood,reduced:boolean){
     const speed=reduced?100:5;drawer.position.z=THREE.MathUtils.damp(drawer.position.z,mood.drawer?-2.58:-3.13,speed,dt);
     windowLeaf.rotation.y=THREE.MathUtils.damp(windowLeaf.rotation.y,mood.window?-2.75:-Math.PI/2,speed*.5,dt);
-    lampLight.intensity=THREE.MathUtils.damp(lampLight.intensity,mood.lamp?1.8:0,5,dt);flameMaterial.opacity=mood.lamp?.9:0;flameMaterial.emissiveIntensity=mood.lamp?1.6:0;
-    if(!reduced){flame.scale.y=2.7+Math.sin(time*9)*.15;dust.rotation.y=Math.sin(time*.04)*.035;for(let i=0;i<curtains.length;i++)curtains[i].rotation.z=mood.window?Math.sin(time*1.3+i)*.015:0;}
+    const flicker=reduced?1:1+Math.sin(time*11.3)*.035+Math.sin(time*27.1)*.025,glow=reduced?1:1+Math.sin(time*2.1)*.12+Math.sin(time*7.7)*.07+Math.sin(time*17.9)*.04;
+    lampLight.intensity=THREE.MathUtils.damp(lampLight.intensity,mood.lamp?2.1*flicker:0,5,dt);flameMaterial.opacity=mood.lamp?.9:0;flameMaterial.emissiveIntensity=mood.lamp?1.6:0;
+    emberLight.intensity=.9*glow;emberMaterial.emissiveIntensity=1.4*glow;
+    if(!reduced){flame.scale.y=2.7+Math.sin(time*9)*.15;dust.rotation.y=Math.sin(time*.04)*.035;dust.position.y=Math.sin(time*.11)*.05;for(let i=0;i<curtains.length;i++)curtains[i].rotation.z=mood.window?Math.sin(time*1.3+i)*.015:0;}
   }};
 }
